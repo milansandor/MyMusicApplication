@@ -41,7 +41,12 @@ import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 
 @Composable
-fun AlbumSongList(album: Album, onBackPress: () -> Unit, onSongClicked: (Song) -> Unit) {
+fun AlbumSongList(
+    album: Album,
+    onBackPress: () -> Unit,
+    onSongClicked: (Song) -> Unit,
+    selectedSong: Song?
+) {
     val painter = if (album.albumArtUri != null) {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
@@ -95,6 +100,7 @@ fun AlbumSongList(album: Album, onBackPress: () -> Unit, onSongClicked: (Song) -
                 SongCard(
                     song = song,
                     isPlaying = isPlaying,
+                    isSelected = song == selectedSong,
                     onClick = {
                         if (isPlaying) {
                             stopCurrentSong()
@@ -114,9 +120,14 @@ fun AlbumSongList(album: Album, onBackPress: () -> Unit, onSongClicked: (Song) -
 }
 
 @Composable
-fun SongCard(song: Song, isPlaying: Boolean, onClick: () -> Unit) {
+fun SongCard(
+    song: Song,
+    isPlaying: Boolean,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     val backgroundColor by animateColorAsState(
-        if (isPlaying) Color.Green else Color.LightGray
+        if (isSelected) Color.Green else Color.LightGray
     )
 
     Row(

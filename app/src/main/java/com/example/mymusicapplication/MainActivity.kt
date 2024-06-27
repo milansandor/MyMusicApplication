@@ -133,9 +133,12 @@ fun MainApplication(albums: List<Album>) {
                     album = selectedAlbum!!,
                     onBackPress = {
                         selectedAlbum = null
-                    },) {
-                    selectedSong = it
-                }
+                    },
+                    onSongClicked = { song ->
+                        selectedSong = song
+                    },
+                    selectedSong = selectedSong
+                )
             }
         }
     }
