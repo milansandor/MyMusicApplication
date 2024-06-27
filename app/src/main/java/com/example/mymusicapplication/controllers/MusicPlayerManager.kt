@@ -2,13 +2,18 @@ package com.example.mymusicapplication.controllers
 
 import android.media.MediaPlayer
 import android.util.Log
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.example.mymusicapplication.models.Song
 
 var mediaPlayer: MediaPlayer? = null
 
 var currentlyPlayingSongId: Long? = null
 var currentlyPlayingSongTitle: String? = null
-var currentSongTitle: String? = null
+var firstStart: Boolean? = false
 
 fun playSong(song: Song) {
     stopCurrentSong()
@@ -28,6 +33,26 @@ fun playSong(song: Song) {
     }
 }
 
+fun pauseSong() {
+    if (currentlyPlayingSongId != null) {
+        mediaPlayer?.apply {
+            pause()
+        }
+    }
+}
+
+fun resumeCurrentSong() {
+    if (currentlyPlayingSongId != null) {
+        mediaPlayer?.apply {
+            start()
+        }
+    }
+}
+
+fun isPlaying(): Boolean {
+    return mediaPlayer?.isPlaying ?: false
+}
+
 fun stopCurrentSong() {
     if (currentlyPlayingSongId != null) {
         mediaPlayer?.apply {
@@ -40,9 +65,4 @@ fun stopCurrentSong() {
         currentlyPlayingSongId = null
         currentlyPlayingSongTitle = null
     }
-}
-
-fun setCurrentSongTitle(songTitle: String): String {
-    currentSongTitle = songTitle;
-    return currentSongTitle as String;
 }

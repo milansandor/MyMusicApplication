@@ -14,8 +14,6 @@ import com.example.mymusicapplication.models.Album
 
 @Composable
 fun AlbumListContainer(albums: List<Album>, onAlbumClick: (Album) -> Unit) {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
     val columnCount = 4
 
     LazyVerticalGrid(

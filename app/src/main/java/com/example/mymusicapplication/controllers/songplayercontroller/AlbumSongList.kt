@@ -35,15 +35,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.mymusicapplication.R
-import com.example.mymusicapplication.controllers.MusicPlayerViewModel
 import com.example.mymusicapplication.controllers.playSong
-import com.example.mymusicapplication.controllers.setCurrentSongTitle
 import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 
 @Composable
-fun AlbumSongList(album: Album, onBackPress: () -> Unit) {
+fun AlbumSongList(album: Album, onBackPress: () -> Unit, onSongClicked: (Song) -> Unit) {
     val painter = if (album.albumArtUri != null) {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
@@ -93,24 +91,21 @@ fun AlbumSongList(album: Album, onBackPress: () -> Unit) {
         LazyColumn {
             items(sortedSongs) {song ->
                 val isPlaying = currentSongId == song.id
-//                var isPlaying = false
 
                 SongCard(
                     song = song,
                     isPlaying = isPlaying,
                     onClick = {
-                        //SmusicPlayerViewModel.playSong(song)
                         if (isPlaying) {
                             stopCurrentSong()
                             currentSongId = null
                             currentSongTitle = null
                         } else {
                             playSong(song)
-                            setCurrentSongTitle(song.title)
+                            onSongClicked(song)
                             currentSongId = song.id
                             currentSongTitle = song.title
                         }
-//                        !isPlaying
                     }
                 )
             }

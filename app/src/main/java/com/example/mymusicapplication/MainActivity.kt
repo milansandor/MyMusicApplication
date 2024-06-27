@@ -26,8 +26,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -37,10 +39,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mymusicapplication.controllers.MusicPlayerViewModel
 import com.example.mymusicapplication.controllers.albumcontroller.AlbumListContainer
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
 import com.example.mymusicapplication.controllers.songplayercontroller.SongManagerComposable
 import com.example.mymusicapplication.models.Album
+import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.screens.PermissionViewModel
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
 
@@ -90,27 +94,27 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Composable
-fun TitleContainer(title: String) {
-    Text(
-        text = title,
-        fontWeight = FontWeight.Bold,
-        fontSize = 45.sp,
-    )
-}
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainApplication(albums: List<Album>) {
     var selectedAlbum by remember {
         mutableStateOf<Album?>(null)
     }
-    var currentlyPlayingSongTitle by remember { mutableStateOf(null) }
+
+    var selectedSong by remember {
+        mutableStateOf<Song?>(null)
+    }
 
     Scaffold(
         bottomBar = {
             BottomAppBar {
-                SongManagerComposable()
+                SongManagerComposable(
+                    selectedSong,
+                    selectedAlbum,
+                    onSongChange = { newSong ->
+                        selectedSong = newSong
+                    }
+                )
             }
         },
     ) { innerPadding ->
@@ -129,9 +133,9 @@ fun MainApplication(albums: List<Album>) {
                     album = selectedAlbum!!,
                     onBackPress = {
                         selectedAlbum = null
-                    },
-
-                )
+                    },) {
+                    selectedSong = it
+                }
             }
         }
     }
