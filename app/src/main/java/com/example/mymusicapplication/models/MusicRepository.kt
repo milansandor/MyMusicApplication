@@ -6,6 +6,8 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import android.util.Log
+import java.io.FileNotFoundException
 
 class MusicRepository(private val context: Context) {
 
@@ -66,7 +68,18 @@ class MusicRepository(private val context: Context) {
             if (it.moveToFirst()) {
                 val albumId = it.getLong(it.getColumnIndex(MediaStore.Audio.Albums._ID))
                 val albumArtUri = Uri.parse("content://media/external/audio/albumart")
-                return ContentUris.withAppendedId(albumArtUri, albumId)
+                val fullAlbumArtUri = ContentUris.withAppendedId(albumArtUri, albumId)
+                Log.i("ALBUM ART URI", fullAlbumArtUri.toString())
+
+                return try {
+                    context.contentResolver.openInputStream(fullAlbumArtUri)?.use {
+                        // Successfully opened stream, album art exists
+                        fullAlbumArtUri
+                    }
+                } catch (e: FileNotFoundException) {
+                    // Album art doesn't exist
+                    null
+                }
             }
         }
         return null
