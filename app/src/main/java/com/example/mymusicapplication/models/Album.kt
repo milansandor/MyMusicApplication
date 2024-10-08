@@ -4,5 +4,6 @@ data class Album(
     val albumName: String,
     val artistName: String,
     val songs: List<Song>,
-    val albumArtUri: String?
+    val albumArtUri: String?,
+    val genre: String
 )

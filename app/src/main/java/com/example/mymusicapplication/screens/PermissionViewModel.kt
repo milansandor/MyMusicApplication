@@ -39,7 +39,11 @@ class PermissionViewModel(application: Application): AndroidViewModel(applicatio
 
     fun checkPermission(context: Context, permission: String) {
         val isGranted = ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        isPermissionGranted.value == isGranted
+        isPermissionGranted.value = isGranted
+
+        if (isGranted) {
+            loadMusic()
+        }
     }
 
     private fun loadMusic() {

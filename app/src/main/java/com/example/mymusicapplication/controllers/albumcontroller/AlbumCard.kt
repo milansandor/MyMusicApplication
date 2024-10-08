@@ -54,7 +54,7 @@ fun AlbumCard(
         Column(
             modifier = Modifier
                 .background(color = Color.White)
-                .height(175.dp)
+                .height(150.dp)
         ) {
             Image(
                 painter = painter,

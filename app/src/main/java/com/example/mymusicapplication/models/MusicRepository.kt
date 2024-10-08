@@ -19,6 +19,7 @@ class MusicRepository(private val context: Context) {
         val cursor = contentResolver.query(uri, null, selection, null, sortOrder)
         cursor?.use { c ->
             val albumMap = mutableMapOf<String, Pair<String, MutableList<Song>>>()
+            val genreMap = mutableMapOf<Long, String>()
 
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
@@ -28,6 +29,8 @@ class MusicRepository(private val context: Context) {
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
                 val duration = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+//                val genre = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
+                val genre = getGenreForSong(id)
 
                 val song = Song(id, trackNumber, title, artist, album, duration, data)
 
@@ -35,13 +38,15 @@ class MusicRepository(private val context: Context) {
                     albumMap[album]?.second?.add(song)
                 } else {
                     albumMap[album] = Pair(artist, mutableListOf(song))
+                    genreMap[id] = genre
                 }
             }
 
             for ((albumName, pair) in albumMap) {
                 val (artist, songs) = pair
                 val albumArtUri = getAlbumArtUri(albumName)
-                val album = Album(albumName, artist, songs, albumArtUri.toString())
+                val genre = genreMap[songs.first().id] ?: "Unknown"
+                val album = Album(albumName, artist, songs, albumArtUri.toString(), genre)
                 albums.add(album)
             }
         }
@@ -65,5 +70,20 @@ class MusicRepository(private val context: Context) {
             }
         }
         return null
+    }
+
+    @SuppressLint("Range")
+    private fun getGenreForSong(songId: Long): String {
+        val uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId.toInt())
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        var genre: String = "Unknown"
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                genre = it.getString(it.getColumnIndex(MediaStore.Audio.Genres.NAME))
+            }
+        }
+
+        return genre
     }
 }
