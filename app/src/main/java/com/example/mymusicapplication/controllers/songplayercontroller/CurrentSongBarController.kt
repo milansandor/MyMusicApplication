@@ -98,9 +98,8 @@ fun SongManagerComposable(
     Row (
         modifier = Modifier
             .fillMaxWidth()
-            .height(80.dp)
-            .background(MaterialTheme.colorScheme.secondary)
-            .padding(8.dp, 8.dp, 8.dp, 8.dp),
+            .fillMaxHeight()
+            .padding(horizontal = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
