@@ -26,15 +26,19 @@ class MusicRepository(private val context: Context) {
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val trackNumber = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
+                val finalTrackNumber = if (trackNumber.length > 3) {
+                    trackNumber.takeLast(2)
+                } else {
+                    trackNumber
+                }
                 val title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
                 val artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
                 val duration = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-//                val genre = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.GENRE))
                 val genre = getGenreForSong(id)
 
-                val song = Song(id, trackNumber, title, artist, album, duration, data)
+                val song = Song(id, finalTrackNumber, title, artist, album, duration, data)
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)

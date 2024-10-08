@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
@@ -96,7 +97,6 @@ fun AlbumSongList(
         LazyColumn {
             items(sortedSongs) {song ->
                 val isPlaying = currentSongId == song.id
-
                 SongCard(
                     song = song,
                     isPlaying = isPlaying,
@@ -127,7 +127,7 @@ fun SongCard(
     onClick: () -> Unit
 ) {
     val backgroundColor by animateColorAsState(
-        if (isSelected) Color.Green else Color.LightGray
+        if (isSelected) Color.Green else Color.Transparent
     )
 
     Row(
@@ -140,25 +140,37 @@ fun SongCard(
             .padding(8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Column {
-            Row {
-                Column(
+        // Texts for track and title in one row
+        Column(
+            modifier = Modifier
+                .weight(1f) // Allows the column to take up available space, pushing the icon to the end
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Track text
+                Text(
+                    text = song.track,
                     modifier = Modifier
-                        .padding(end = 8.dp)
-                ) {
-                    Text(
-                        text = song.track,
-                    )
-                }
-                Column {
-                    Text(
-                        text = song.title,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+                        .padding(end = 8.dp) // Padding to separate track from title
+                )
+
+                // Title text
+                Text(
+                    text = song.title,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f) // Title will take available width and ellipsis if needed
+                )
             }
         }
-        Spacer(modifier = Modifier.weight(1f))
+
+        // Spacer pushing the icon to the far right
+        Spacer(modifier = Modifier.width(16.dp))
+
+        // MoreVert icon
         Icon(Icons.Default.MoreVert, contentDescription = "song edit")
     }
 }
