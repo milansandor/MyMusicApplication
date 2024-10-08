@@ -17,6 +17,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -40,13 +42,14 @@ import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
+import com.example.mymusicapplication.screens.TagInputDialog
 
 @Composable
 fun AlbumSongList(
     album: Album,
     onBackPress: () -> Unit,
     onSongClicked: (Song) -> Unit,
-    selectedSong: Song?
+    selectedSong: Song?,
 ) {
     val painter = if (album.albumArtUri != null) {
         rememberAsyncImagePainter(model = album.albumArtUri)
@@ -112,6 +115,9 @@ fun AlbumSongList(
                             currentSongId = song.id
                             currentSongTitle = song.title
                         }
+                    },
+                    onTagAdded = { newTag ->
+                        println("New tag added: $newTag")
                     }
                 )
             }
@@ -124,10 +130,21 @@ fun SongCard(
     song: Song,
     isPlaying: Boolean,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onTagAdded: (String) -> Unit
 ) {
+    var expanded by remember {
+        mutableStateOf(false)
+    }
+    var showInputDialog by remember {
+        mutableStateOf(false)
+    }
+    var newTag by remember {
+        mutableStateOf("")
+    }
+
     val backgroundColor by animateColorAsState(
-        if (isSelected) Color.Green else Color.Transparent
+        if (isSelected) Color.Green else Color.Transparent, label = ""
     )
 
     Row(
@@ -171,6 +188,40 @@ fun SongCard(
         Spacer(modifier = Modifier.width(16.dp))
 
         // MoreVert icon
-        Icon(Icons.Default.MoreVert, contentDescription = "song edit")
+        Icon(
+            Icons.Default.MoreVert, contentDescription = "song edit",
+            modifier = Modifier
+                .clickable {
+                    expanded = true
+                }
+        )
+
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            DropdownMenuItem(
+                text = {
+                    Text(text = "Add Tag")
+                },
+                onClick = {
+                    expanded = false
+                    showInputDialog = true
+                }
+            )
+        }
+
+        if (showInputDialog) {
+            TagInputDialog(
+                onDismiss = {
+                    showInputDialog = false
+                },
+                onTagAdded = { tag ->
+                    onTagAdded(tag)
+                    showInputDialog = false
+                    newTag = ""
+                }
+            )
+        }
     }
 }
