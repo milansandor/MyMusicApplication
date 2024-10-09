@@ -5,5 +5,6 @@ data class Album(
     val artistName: String,
     val songs: List<Song>,
     val albumArtUri: String?,
-    val genre: String
+    val genre: String,
+    var lastVisited: Long,
 )

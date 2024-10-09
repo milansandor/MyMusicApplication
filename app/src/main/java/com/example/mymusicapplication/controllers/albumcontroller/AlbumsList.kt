@@ -16,13 +16,16 @@ import com.example.mymusicapplication.models.Album
 fun AlbumListContainer(albums: List<Album>, onAlbumClick: (Album) -> Unit) {
     val columnCount = 4
 
+    val sortedAlbums = albums.sortedByDescending { it.lastVisited }
+
     LazyVerticalGrid(
         columns = GridCells.Fixed(columnCount),
     ) {
-        items(albums) {album ->
+        items(sortedAlbums) {album ->
             AlbumCard(
                 album = album,
                 onClick = {
+                    album.lastVisited = System.currentTimeMillis()
                     onAlbumClick(album)
                 },
                 modifier = Modifier

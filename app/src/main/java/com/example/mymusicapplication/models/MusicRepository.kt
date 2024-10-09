@@ -52,7 +52,7 @@ class MusicRepository(private val context: Context) {
                 val (artist, songs) = pair
                 val albumArtUri = getAlbumArtUri(albumName)
                 val genre = genreMap[songs.first().id] ?: "Unknown"
-                val album = Album(albumName, artist, songs, albumArtUri.toString(), genre)
+                val album = Album(albumName, artist, songs, albumArtUri.toString(), genre, 0)
                 albums.add(album)
             }
         }
