@@ -1,13 +1,20 @@
 package com.example.mymusicapplication
 
 import android.Manifest
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,63 +42,108 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymusicapplication.controllers.albumcontroller.AlbumListContainer
+import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
 import com.example.mymusicapplication.controllers.songplayercontroller.SongManagerComposable
+import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
+import com.example.mymusicapplication.screens.PermissionDialog
 import com.example.mymusicapplication.screens.PermissionViewModel
+import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.screens.TagSearchModal
+import com.example.mymusicapplication.screens.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
 
 class MainActivity : ComponentActivity() {
+
+    private val permissionsToRequest = arrayOf(
+//        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE,
+//        Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+    )
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyMusicApplicationTheme {
                 val viewModel = viewModel<PermissionViewModel>()
-
-                LaunchedEffect(Unit) {
-                    viewModel.checkPermission(this@MainActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
-                }
-
-                val isPermissionGranted by viewModel.isPermissionGranted
+                val dialogQueue = viewModel.visiblePermissionDialogQueue
+                val isPermissionsGranted by viewModel.isPermissionGranted
                 val albums by viewModel.albums.collectAsState()
 
-                val imagePermissionResultLauncher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.RequestPermission(),
-                    onResult = { isGranted ->
-                        viewModel.onPermissionResult(
-                            permission = Manifest.permission.READ_EXTERNAL_STORAGE,
-                            isGranted = isGranted
-                        )
+                val permissionResultLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestMultiplePermissions(),
+                    onResult = { perms ->
+                        permissionsToRequest.forEach { permission ->
+                            viewModel.onPermissionResult(
+                                permission = permission,
+                                isGranted = perms[permission] == true
+                            )
+                        }
                     }
                 )
-                if (isPermissionGranted) {
-                    MainApplication(albums)
+
+                if (isPermissionsGranted) {
+                    MainApplication(albums = albums, context = this@MainActivity)
                 } else {
                     Column(
                         modifier = Modifier.fillMaxSize(),
                         verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.CenterHorizontally,
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button(onClick = {
-                            imagePermissionResultLauncher.launch(
-                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            permissionResultLauncher.launch(
+                                permissionsToRequest
                             )
                         }) {
-                            Text(text = "Request one permission")
+                            Text(text = "Request required permissions")
                         }
                     }
                 }
+
+                dialogQueue
+                    .reversed()
+                    .forEach { permission -> 
+                        PermissionDialog(
+                            permissionTextProvider =
+                                when (permission) {
+                                    Manifest.permission.READ_EXTERNAL_STORAGE -> {
+                                        ReadExternalStoragePermissionTextProvider()
+                                    }
+                                    Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                                        WriteExternalStoragePermissionTextProvider()
+                                    }
+                                    else -> return@forEach
+                                },
+                            isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
+                                permission
+                            ),
+                            onDismiss = viewModel::dismissDialog,
+                            onOkClick = {
+                                viewModel.dismissDialog()
+                                permissionResultLauncher.launch(
+                                    arrayOf(permission)
+                                )
+                            },
+                            onGoToAppSettings = ::openAppSettings
+                        )
+                    }
             }
         }
     }
 }
 
+fun Activity.openAppSettings() {
+    Intent(
+        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+        Uri.fromParts("package", packageName, null)
+    ).also(::startActivity)
+}
 
 @Composable
-fun MainApplication(albums: List<Album>) {
+fun MainApplication(albums: List<Album>, context: Context) {
     var selectedAlbum by remember {
         mutableStateOf<Album?>(null)
     }
@@ -102,6 +154,7 @@ fun MainApplication(albums: List<Album>) {
     var isModalOpen by remember {
         mutableStateOf(false)
     }
+    Log.i("genres:", selectedAlbum?.genre.toString())
 
     var checkedTags by remember {
         val genre = albums.map { it.genre }.distinct()
@@ -114,7 +167,7 @@ fun MainApplication(albums: List<Album>) {
         albums
     } else {
         albums.filter { album ->
-            activeTags.contains(album.genre)
+            activeTags.all { tag -> album.genre.contains(tag) }
         }
     }
 
@@ -131,7 +184,9 @@ fun MainApplication(albums: List<Album>) {
                     selectedSong,
                     selectedAlbum,
                     onSongChange = { newSong ->
+                        stopCurrentSong()
                         selectedSong = newSong
+                        playSong(selectedSong!!)
                     },
                     onTagSearchClick = {isModalOpen = true},
                 )
@@ -160,11 +215,12 @@ fun MainApplication(albums: List<Album>) {
 
             Row {
                 if (selectedAlbum == null) {
-                    AlbumListContainer(albums = filteredAlbums) { album ->
+                    AlbumListContainer(albums = filteredAlbums, selectedSong = selectedSong) { album ->
                         selectedAlbum = album
                     }
                 } else {
                     AlbumSongList(
+                        context = context,
                         album = selectedAlbum!!,
                         onBackPress = {
                             selectedAlbum = null

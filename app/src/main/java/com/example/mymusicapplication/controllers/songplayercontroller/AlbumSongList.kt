@@ -1,5 +1,7 @@
 package com.example.mymusicapplication.controllers.songplayercontroller
 
+import android.content.Context
+import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -46,6 +48,7 @@ import com.example.mymusicapplication.screens.TagInputDialog
 
 @Composable
 fun AlbumSongList(
+    context: Context,
     album: Album,
     onBackPress: () -> Unit,
     onSongClicked: (Song) -> Unit,
@@ -101,6 +104,7 @@ fun AlbumSongList(
             items(sortedSongs) {song ->
                 val isPlaying = currentSongId == song.id
                 SongCard(
+                    context = context,
                     song = song,
                     isPlaying = isPlaying,
                     isSelected = song == selectedSong,
@@ -127,6 +131,7 @@ fun AlbumSongList(
 
 @Composable
 fun SongCard(
+    context: Context,
     song: Song,
     isPlaying: Boolean,
     isSelected: Boolean,
@@ -212,7 +217,10 @@ fun SongCard(
         }
 
         if (showInputDialog) {
+            Log.i("ADD_TAG_TO_SONG", "${song.title}")
             TagInputDialog(
+                context = context,
+                song = song,
                 onDismiss = {
                     showInputDialog = false
                 },

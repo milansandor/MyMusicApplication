@@ -25,10 +25,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mymusicapplication.R
 import com.example.mymusicapplication.models.Album
 
 
@@ -58,10 +60,10 @@ fun TagSearchButton(onClick: () -> Unit) {
         onClick = onClick
     ) {
         Icon(
-            imageVector = Icons.Default.Search,
-            contentDescription = "search icon",
-            tint = Color.Black,
-            modifier = Modifier.size(20.dp)
+            painterResource(id = R.drawable.search_icon_white),
+            "",
+            modifier = Modifier.size(14.dp),
+            tint = Color.White
         )
     }
 }

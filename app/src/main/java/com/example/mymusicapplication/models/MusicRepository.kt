@@ -3,6 +3,7 @@ package com.example.mymusicapplication.models
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
@@ -102,5 +103,24 @@ class MusicRepository(private val context: Context) {
         }
 
         return genre
+    }
+
+    @SuppressLint("Range")
+    public fun setNewGenreForSong(songId: Long, newTag: String) {
+        val uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId.toInt())
+        val cursor = context.contentResolver.query(uri, null, null, null, null)
+        var genre: String = "Unknown"
+
+        cursor?.use {
+            if (it.moveToFirst()) {
+                genre = it.getString(it.getColumnIndex(MediaStore.Audio.Genres.NAME))
+            }
+        }
+
+        val contentValues = ContentValues().apply {
+            put(MediaStore.Audio.Genres.NAME, "$genre;$newTag")
+        }
+
+        context.contentResolver.update(uri, contentValues, null, null)
     }
 }

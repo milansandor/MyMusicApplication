@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -20,7 +21,9 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +31,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.mymusicapplication.R
 import com.example.mymusicapplication.controllers.isPlaying
@@ -72,24 +78,22 @@ fun SongManagerComposable(
         return null
     }
 
-    fun getPreviousSong(song: Song?): Song {
+    fun getPreviousSong(song: Song?): Song? {
         var cSongIndex = findSongIndex(songList, song)
-        if (cSongIndex == 0) {
-            exitProcess(404)
+        return if (cSongIndex != null && cSongIndex > 0) {
+            getItem(cSongIndex - 1)
+        } else {
+            null // Return null if no previous song exists.
         }
-
-        var newPosition = cSongIndex?.minus(1)
-        return getItem(newPosition)
     }
 
-    fun getNextSong(song: Song?): Song {
-        var cSongIndex = findSongIndex(songList, song)
-        if (cSongIndex == songList.size - 1) {
-            exitProcess(404)
+    fun getNextSong(song: Song?): Song? {
+        val cSongIndex = findSongIndex(songList, song)
+        return if (cSongIndex != null && cSongIndex < songList.size - 1) {
+            getItem(cSongIndex + 1)
+        } else {
+            null // Return null if no next song exists.
         }
-
-        var newPosition = cSongIndex?.plus(1)
-        return getItem(newPosition)
     }
 
 
@@ -103,19 +107,40 @@ fun SongManagerComposable(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(
-            text = currentSong?.title ?: "",
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
+        Row(
             modifier = Modifier
-                .weight(2f),
-        )
+                .weight(1f),
+            horizontalArrangement = Arrangement.Start
+        ) {
+            OutlinedButton(
+                onClick = { /*TODO*/ },
+                modifier = Modifier
+                    .padding(start = 4.dp)
+            ) {
+                Text(text = "New Tag", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Filled.Add, contentDescription = "", Modifier.size(14.dp), tint = Color.White)
+            }
+        }
+
 
         Row(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.weight(2f),
             horizontalArrangement = Arrangement.End
         ) {
             var isSongPlaying = remember { mutableStateOf(false) }
+            IconButton(onClick = {
+                getPreviousSong(currentSong)?.let { previousSong ->
+                    onSongChange(previousSong)
+                }
+            }) {
+                Icon(
+                    painterResource(id = R.drawable.previous),
+                    contentDescription = "",
+                    modifier = Modifier.size(14.dp),
+                    tint = Color.White
+                )
+            }
+
             IconButton(
                 onClick = {
                     if (isPlaying()) {
@@ -129,17 +154,41 @@ fun SongManagerComposable(
             ) {
                 if (!isSongPlaying.value) {
                     Icon(
-                        Icons.Filled.PlayArrow,
+                        painterResource(id = R.drawable.play_button_arrowhead),
                         "",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.White,
                     )
                 } else {
                     Icon(
-                        Icons.Filled.Close,
+                        painterResource(id = R.drawable.pause_white),
                         "",
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(14.dp),
+                        tint = Color.White,
                     )
                 }
+            }
+
+            IconButton(onClick = {
+                getNextSong(currentSong)?.let { nextSong ->
+                    onSongChange(nextSong)
+                }
+            }) {
+                Icon(
+                    painterResource(id = R.drawable.next),
+                    contentDescription = "",
+                    modifier = Modifier.size(14.dp),
+                    tint = Color.White
+                )
+            }
+
+            IconButton(onClick = { /*TODO*/ }) {
+                Icon(
+                    painterResource(id = R.drawable.filter),
+                    contentDescription = "",
+                    modifier = Modifier.size(14.dp),
+                    tint = Color.White
+                )
             }
 
             TagSearchButton(onClick = onTagSearchClick)

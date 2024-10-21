@@ -2,18 +2,16 @@ package com.example.mymusicapplication.controllers.albumcontroller
 
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.unit.dp
 import com.example.mymusicapplication.models.Album
+import com.example.mymusicapplication.models.Song
 
 @Composable
-fun AlbumListContainer(albums: List<Album>, onAlbumClick: (Album) -> Unit) {
+fun AlbumListContainer(albums: List<Album>, selectedSong: Song?, onAlbumClick: (Album) -> Unit) {
     val columnCount = 4
 
     val sortedAlbums = albums.sortedByDescending { it.lastVisited }
@@ -28,6 +26,7 @@ fun AlbumListContainer(albums: List<Album>, onAlbumClick: (Album) -> Unit) {
                     album.lastVisited = System.currentTimeMillis()
                     onAlbumClick(album)
                 },
+                selectedSong = selectedSong,
                 modifier = Modifier
                     .height(IntrinsicSize.Min)
             )
