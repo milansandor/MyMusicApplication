@@ -27,8 +27,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymusicapplication.controllers.albumcontroller.AlbumListContainer
+import com.example.mymusicapplication.controllers.isPlaying
 import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
@@ -146,10 +150,32 @@ fun MainApplication(albums: List<Album>, context: Context) {
     var currentlyPlayingAlbum by remember { mutableStateOf<Album?>(null) }
     var selectedSong by remember { mutableStateOf<Song?>(null) }
     var isModalOpen by remember { mutableStateOf(false) }
+    var isSongPlaying by remember { mutableStateOf(false) }
 
-    var checkedTags by remember {
-        val genre = albums.map { it.genre }.distinct()
-        mutableStateOf(genre.associateWith { false })
+    // tags and checked tags
+    val tags = remember {
+        mutableStateListOf(*albums.map { it.genre }.distinct().toTypedArray())
+    }
+    val checkedTags = remember { mutableStateMapOf<String, Boolean>() }
+
+    LaunchedEffect(tags) {
+        tags.forEach { tag ->
+            if (checkedTags[tag] == null) {
+                checkedTags[tag] = false
+            }
+        }
+    }
+
+    val onAddTag: (String) -> Unit = { newTag ->
+        if (newTag.isNotBlank() && !tags.contains(newTag)) {
+            tags.add(newTag)
+            checkedTags[newTag] = false
+        }
+    }
+
+    val onRemoveTag: (String) -> Unit = { tag ->
+        tags.remove(tag)
+        checkedTags.remove(tag)
     }
 
     val onSongEnd: () -> Unit = {
@@ -197,7 +223,11 @@ fun MainApplication(albums: List<Album>, context: Context) {
                         playSong(selectedSong!!)
                         Log.i("NEW_SONG", "$newSong")
                     },
-                    onTagSearchClick = {isModalOpen = true},
+                    onTagSearchClick = { isModalOpen = !isModalOpen },
+                    isSongCurrentlyPlaying = isSongPlaying,
+                    onIsSongCurrentlyPlayingChange = { newValue ->
+                        isSongPlaying = newValue
+                    }
                 )
             }
         },
@@ -210,15 +240,16 @@ fun MainApplication(albums: List<Album>, context: Context) {
             if (selectedAlbum == null) {
                 TagSearchModal(
                     albums = albums,
+                    tags = tags,
                     checkedTags = checkedTags,
                     onCheckedTagChange = { tag, isChecked ->
-                        checkedTags = checkedTags.toMutableMap().apply {
-                            put(tag, isChecked)
-                            Log.i("checked:", checkedTags.toString())
-                        }
+                        checkedTags[tag] = isChecked
+                        Log.i("checked:", checkedTags.toString())
                     },
                     isModalOpen = isModalOpen,
-                    onDismiss = { isModalOpen = false }
+                    onDismiss = { isModalOpen = false },
+                    onAddTag = onAddTag,
+                    onRemoveTag = onRemoveTag
                 )
             }
 
@@ -238,7 +269,11 @@ fun MainApplication(albums: List<Album>, context: Context) {
                             selectedSong = song
                             currentlyPlayingAlbum = selectedAlbum
                         },
-                        selectedSong = selectedSong
+                        selectedSong = selectedSong,
+                        isSongCurrentlyPlaying = isSongPlaying,
+                        onIsSongCurrentlyPlayingChange = { newValue ->
+                            isSongPlaying = newValue
+                        }
                     )
                 }
             }

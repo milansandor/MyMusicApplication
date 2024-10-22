@@ -3,12 +3,12 @@ package com.example.mymusicapplication.controllers.songplayercontroller
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mymusicapplication.R
@@ -29,7 +30,6 @@ import com.example.mymusicapplication.controllers.pauseSong
 import com.example.mymusicapplication.controllers.resumeCurrentSong
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
-import com.example.mymusicapplication.screens.TagSearchButton
 
 
 @Composable
@@ -38,6 +38,8 @@ fun SongManagerComposable(
     currentlyPlayingAlbum: Album?,
     onSongChange: (Song) -> Unit,
     onTagSearchClick: () -> Unit,
+    isSongCurrentlyPlaying: Boolean,
+    onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
 ) {
     val sortedSongs = currentlyPlayingAlbum?.songs?.sortedBy { it.track.toInt() }
     var songList = listOf<Song>()
@@ -95,21 +97,33 @@ fun SongManagerComposable(
             horizontalArrangement = Arrangement.Start
         ) {
             OutlinedButton(
-                onClick = { /*TODO*/ },
+                onClick = onTagSearchClick,
                 modifier = Modifier
                     .padding(start = 4.dp)
+                    .fillMaxWidth()
             ) {
-                Text(text = "New Tag", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                Icon(Icons.Filled.Add, contentDescription = "", Modifier.size(14.dp), tint = Color.White)
+                Icon(
+                    painterResource(id = R.drawable.search_icon_white),
+                    "",
+                    modifier = Modifier.size(10.dp),
+                    tint = Color.White
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Tag Search",
+                    color = Color.White,
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
             }
         }
-
 
         Row(
             modifier = Modifier.weight(2f),
             horizontalArrangement = Arrangement.End
         ) {
-            var isSongPlaying = remember { mutableStateOf(false) }
             IconButton(onClick = {
                 getPreviousSong(currentSong)?.let { previousSong ->
                     onSongChange(previousSong)
@@ -127,14 +141,14 @@ fun SongManagerComposable(
                 onClick = {
                     if (isPlaying()) {
                         pauseSong()
-                        isSongPlaying.value = isPlaying()
+                        onIsSongCurrentlyPlayingChange(false)
                     } else {
                         resumeCurrentSong()
-                        isSongPlaying.value = isPlaying()
+                        onIsSongCurrentlyPlayingChange(true)
                     }
                 }
             ) {
-                if (!isSongPlaying.value) {
+                if (!isSongCurrentlyPlaying) {
                     Icon(
                         painterResource(id = R.drawable.play_button_arrowhead),
                         "",
@@ -173,7 +187,7 @@ fun SongManagerComposable(
                 )
             }
 
-            TagSearchButton(onClick = onTagSearchClick)
+//            TagSearchButton(onClick = onTagSearchClick)
         }
     }
 }

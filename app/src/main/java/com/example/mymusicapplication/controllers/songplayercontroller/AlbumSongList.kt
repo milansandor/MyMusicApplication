@@ -53,6 +53,8 @@ fun AlbumSongList(
     onBackPress: () -> Unit,
     onSongClicked: (Song) -> Unit,
     selectedSong: Song?,
+    isSongCurrentlyPlaying: Boolean,
+    onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
 ) {
     val painter = if (album.albumArtUri != null) {
         rememberAsyncImagePainter(model = album.albumArtUri)
@@ -102,7 +104,7 @@ fun AlbumSongList(
 
         LazyColumn {
             items(sortedSongs) {song ->
-                val isPlaying = currentSongId == song.id
+                val isPlaying = song == selectedSong && isSongCurrentlyPlaying
                 SongCard(
                     context = context,
                     song = song,
@@ -111,11 +113,13 @@ fun AlbumSongList(
                     onClick = {
                         if (isPlaying) {
                             stopCurrentSong()
+                            onIsSongCurrentlyPlayingChange(false)
                             currentSongId = null
                             currentSongTitle = null
                         } else {
                             playSong(song)
                             onSongClicked(song)
+                            onIsSongCurrentlyPlayingChange(true)
                             currentSongId = song.id
                             currentSongTitle = song.title
                         }

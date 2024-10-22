@@ -29,6 +29,10 @@ class PermissionViewModel(application: Application): AndroidViewModel(applicatio
     private val _albums = MutableStateFlow<List<Album>>(emptyList())
     val albums: StateFlow<List<Album>> = _albums
 
+    init {
+        checkAllPermissionsGranted()
+    }
+
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
         checkAllPermissionsGranted()
@@ -64,57 +68,4 @@ class PermissionViewModel(application: Application): AndroidViewModel(applicatio
             _albums.value = albumList
         }
     }
-
-    /*fun onPermissionResult(
-        isGranted: Boolean
-    ) {
-        if (!isGranted) {
-            visiblePermissionDialogQueue.add(0, requiredPermissions[currentPermissionIndex])
-        }
-        // Move to the next permission
-        currentPermissionIndex++
-
-        // Check if we have requested all permissions
-        if (currentPermissionIndex < requiredPermissions.size) {
-            // Still more permissions to check
-            checkNextPermission()
-        } else {
-            // All permissions checked, update the permission status
-            isPermissionGranted.value = checkAllPermissionsGranted()
-            if (isPermissionGranted.value) {
-                loadMusic()
-            }
-        }
-    }
-
-     fun checkNextPermission() {
-        if (currentPermissionIndex < requiredPermissions.size) {
-            val permission = requiredPermissions[currentPermissionIndex]
-            val isGranted = ContextCompat.checkSelfPermission(
-                getApplication(),
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-
-            if (!isGranted) {
-                // Trigger a request for the next permission
-                visiblePermissionDialogQueue.add(0, permission)
-            } else {
-                // If granted, move to the next permission
-                currentPermissionIndex++
-                checkNextPermission()
-            }
-        } else {
-            // All permissions have been checked
-            isPermissionGranted.value = true
-        }
-    }
-
-    private fun checkAllPermissionsGranted(): Boolean {
-        return requiredPermissions.all { permission ->
-            ContextCompat.checkSelfPermission(
-                getApplication(),
-                permission
-            ) == PackageManager.PERMISSION_GRANTED
-        }
-    }*/
 }
