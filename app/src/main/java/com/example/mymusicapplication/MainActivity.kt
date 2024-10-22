@@ -5,7 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -14,7 +13,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -29,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymusicapplication.controllers.albumcontroller.AlbumListContainer
 import com.example.mymusicapplication.controllers.playSong
+import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
 import com.example.mymusicapplication.controllers.songplayercontroller.SongManagerComposable
 import com.example.mymusicapplication.controllers.stopCurrentSong
@@ -144,22 +142,32 @@ fun Activity.openAppSettings() {
 
 @Composable
 fun MainApplication(albums: List<Album>, context: Context) {
-    var selectedAlbum by remember {
-        mutableStateOf<Album?>(null)
-    }
-    var selectedSong by remember {
-        mutableStateOf<Song?>(null)
-    }
-
-    var isModalOpen by remember {
-        mutableStateOf(false)
-    }
-    Log.i("genres:", selectedAlbum?.genre.toString())
+    var selectedAlbum by remember { mutableStateOf<Album?>(null) }
+    var currentlyPlayingAlbum by remember { mutableStateOf<Album?>(null) }
+    var selectedSong by remember { mutableStateOf<Song?>(null) }
+    var isModalOpen by remember { mutableStateOf(false) }
 
     var checkedTags by remember {
         val genre = albums.map { it.genre }.distinct()
         mutableStateOf(genre.associateWith { false })
     }
+
+    val onSongEnd: () -> Unit = {
+        val songList = currentlyPlayingAlbum?.songs?.sortedBy { it.track.toInt() } ?: emptyList()
+        val currentIndex = songList.indexOfFirst { it.title == selectedSong?.title }
+        val nextIndex = currentIndex + 1
+        if (nextIndex < songList.size) {
+            val nextSong = songList[nextIndex]
+            selectedSong = nextSong
+            playSong(nextSong)
+        } else {
+            // No more songs in the album
+            stopCurrentSong()
+            selectedSong = null
+        }
+    }
+
+    setOnSongEndListener(onSongEnd)
 
     val activeTags = checkedTags.filterValues { it }.keys
 
@@ -181,12 +189,13 @@ fun MainApplication(albums: List<Album>, context: Context) {
                 contentPadding = PaddingValues(0.dp),
             ) {
                 SongManagerComposable(
-                    selectedSong,
-                    selectedAlbum,
+                    currentSong = selectedSong,
+                    currentlyPlayingAlbum = currentlyPlayingAlbum,
                     onSongChange = { newSong ->
                         stopCurrentSong()
                         selectedSong = newSong
                         playSong(selectedSong!!)
+                        Log.i("NEW_SONG", "$newSong")
                     },
                     onTagSearchClick = {isModalOpen = true},
                 )
@@ -227,6 +236,7 @@ fun MainApplication(albums: List<Album>, context: Context) {
                         },
                         onSongClicked = { song ->
                             selectedSong = song
+                            currentlyPlayingAlbum = selectedAlbum
                         },
                         selectedSong = selectedSong
                     )
