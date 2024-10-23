@@ -2,13 +2,12 @@ package com.example.mymusicapplication.screens
 
 import android.Manifest
 import android.app.Application
-import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.MusicRepository
@@ -19,9 +18,28 @@ import kotlinx.coroutines.launch
 class PermissionViewModel(application: Application): AndroidViewModel(application) {
     private val musicRepository = MusicRepository(application)
 
-    private val requiredPermissions = listOf(
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
+    private val requiredPermissions: List<String>
+        get() {
+            val perms = mutableListOf<String>()
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+//                    perms.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                    perms.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+                else -> {
+                    perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
+            }
+            return perms
+        }
 
     val visiblePermissionDialogQueue = mutableStateListOf<String>()
     val isPermissionGranted  = mutableStateOf(false)
@@ -65,6 +83,21 @@ class PermissionViewModel(application: Application): AndroidViewModel(applicatio
     private fun loadMusic() {
         viewModelScope.launch {
             val albumList = musicRepository.getAllMusic()
+            _albums.value = albumList
+        }
+    }
+
+    private fun loadMedia() {
+        viewModelScope.launch {
+            val albumList = when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                    // Access media using URIs from the Photo Picker
+                    musicRepository.getAllMusic()
+                }
+                else -> {
+                    musicRepository.getAllMusic()
+                }
+            }
             _albums.value = albumList
         }
     }

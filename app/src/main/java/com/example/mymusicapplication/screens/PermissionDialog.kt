@@ -73,6 +73,43 @@ class ReadExternalStoragePermissionTextProvider: PermissionTextProvider {
     }
 }
 
+class ReadMediaVisualUserSelectedPermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if (isPermanentlyDeclined) {
+            "It seems you permanently declined to hand pick the access for your visual media permission. " +
+                    "If you want this application to have access to your visual media " +
+                    "go to app setting to grant it."
+        } else {
+            "This app needs access to read your visual media to be able to display album covers."
+        }
+    }
+}
+
+class ReadMediaAudioPermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if (isPermanentlyDeclined) {
+            "It seems you permanently declined read media audio permission. " +
+                    "If you want this application to have access to your music " +
+                    "go to app setting to grant it."
+        } else {
+            "This app needs access to read your media audio to be able to play your music."
+        }
+    }
+}
+
+class ReadMediaImagesPermissionTextProvider: PermissionTextProvider {
+    override fun getDescription(isPermanentlyDeclined: Boolean): String {
+        return if (isPermanentlyDeclined) {
+            "It seems you permanently declined read media images permission. " +
+                    "If you want this application to have access to your images " +
+                    "go to app setting to grant it."
+        } else {
+            "This app needs access to read your media images to be able to show existing album arts."
+        }
+    }
+}
+
+
 class WriteExternalStoragePermissionTextProvider: PermissionTextProvider {
     override fun getDescription(isPermanentlyDeclined: Boolean): String {
         return if (isPermanentlyDeclined) {

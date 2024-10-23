@@ -5,6 +5,7 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import android.util.Log
@@ -42,7 +43,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymusicapplication.controllers.albumcontroller.AlbumListContainer
-import com.example.mymusicapplication.controllers.isPlaying
 import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
@@ -53,17 +53,37 @@ import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.screens.PermissionDialog
 import com.example.mymusicapplication.screens.PermissionViewModel
 import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
+import com.example.mymusicapplication.screens.ReadMediaAudioPermissionTextProvider
+import com.example.mymusicapplication.screens.ReadMediaImagesPermissionTextProvider
+import com.example.mymusicapplication.screens.ReadMediaVisualUserSelectedPermissionTextProvider
 import com.example.mymusicapplication.screens.TagSearchModal
 import com.example.mymusicapplication.screens.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
 
 class MainActivity : ComponentActivity() {
 
-    private val permissionsToRequest = arrayOf(
-//        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-//        Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-    )
+    private val permissionsToRequest: Array<String>
+        get() {
+            val perms = mutableListOf<String>()
+            when {
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+//                    perms.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
+                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
+                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
+                }
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
+                    perms.add(Manifest.permission.READ_EXTERNAL_STORAGE)
+                }
+                else -> {
+                    perms.add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                }
+            }
+            return perms.toTypedArray()
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -96,6 +116,7 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button(onClick = {
+                            // TODO: implement optional access to images
                             permissionResultLauncher.launch(
                                 permissionsToRequest
                             )
@@ -111,6 +132,15 @@ class MainActivity : ComponentActivity() {
                         PermissionDialog(
                             permissionTextProvider =
                                 when (permission) {
+                                    /*Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED -> {
+                                        ReadMediaVisualUserSelectedPermissionTextProvider()
+                                    }*/
+                                    Manifest.permission.READ_MEDIA_AUDIO -> {
+                                        ReadMediaAudioPermissionTextProvider()
+                                    }
+                                    Manifest.permission.READ_MEDIA_IMAGES -> {
+                                        ReadMediaImagesPermissionTextProvider()
+                                    }
                                     Manifest.permission.READ_EXTERNAL_STORAGE -> {
                                         ReadExternalStoragePermissionTextProvider()
                                     }
