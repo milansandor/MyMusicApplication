@@ -64,20 +64,22 @@ fun SongManagerComposable(
 
     fun getPreviousSong(song: Song?): Song? {
         val cSongIndex = findSongIndex(songList, song)
-        return if (cSongIndex != null && cSongIndex > 0) {
-            getItem(cSongIndex - 1)
-        } else {
-            null // Return null if no previous song exists.
+        if (cSongIndex != null && cSongIndex > 0) {
+            onIsSongCurrentlyPlayingChange(true)
+            return getItem(cSongIndex - 1)
         }
+
+        return null
     }
 
     fun getNextSong(song: Song?): Song? {
         val cSongIndex = findSongIndex(songList, song)
-        return if (cSongIndex != null && cSongIndex < songList.size - 1) {
-            getItem(cSongIndex + 1)
-        } else {
-            null // Return null if no next song exists.
+        if (cSongIndex != null && cSongIndex < songList.size - 1) {
+            onIsSongCurrentlyPlayingChange(true)
+            return getItem(cSongIndex + 1)
         }
+
+        return null
     }
 
 
@@ -142,7 +144,7 @@ fun SongManagerComposable(
                     if (isPlaying()) {
                         pauseSong()
                         onIsSongCurrentlyPlayingChange(false)
-                    } else {
+                    } else if (!isPlaying() && currentSong != null) {
                         resumeCurrentSong()
                         onIsSongCurrentlyPlayingChange(true)
                     }
