@@ -8,6 +8,7 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import java.io.File
 import java.io.FileNotFoundException
 
 class MusicRepository(private val context: Context) {
@@ -52,13 +53,28 @@ class MusicRepository(private val context: Context) {
             for ((albumName, pair) in albumMap) {
                 val (artist, songs) = pair
                 val albumArtUri = getAlbumArtUri(albumName)
+                val albumArtPath = if (albumArtUri != null && fileExists(albumArtUri)) {
+                    albumArtUri.toString()
+                } else {
+                    null
+                }
                 val genre = genreMap[songs.first().id] ?: "Unknown"
-                val album = Album(albumName, artist, songs, albumArtUri.toString(), genre, 0)
+                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre, 0)
                 albums.add(album)
             }
         }
 
         return albums
+    }
+
+    private fun fileExists(uri: Uri): Boolean {
+        return try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            inputStream?.close()
+            true
+        } catch (e: Exception) {
+            false
+        }
     }
 
     @SuppressLint("Range")
@@ -74,12 +90,11 @@ class MusicRepository(private val context: Context) {
                 val albumId = it.getLong(it.getColumnIndex(MediaStore.Audio.Albums._ID))
                 val albumArtUri = Uri.parse("content://media/external/audio/albumart")
                 val fullAlbumArtUri = ContentUris.withAppendedId(albumArtUri, albumId)
-                Log.i("ALBUM ART URI", fullAlbumArtUri.toString())
 
                 return try {
                     context.contentResolver.openInputStream(fullAlbumArtUri)?.use {
                         // Successfully opened stream, album art exists
-                        fullAlbumArtUri
+                        return fullAlbumArtUri
                     }
                 } catch (e: FileNotFoundException) {
                     // Album art doesn't exist

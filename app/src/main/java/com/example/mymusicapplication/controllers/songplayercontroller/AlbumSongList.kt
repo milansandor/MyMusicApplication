@@ -56,10 +56,10 @@ fun AlbumSongList(
     isSongCurrentlyPlaying: Boolean,
     onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
 ) {
-    val painter = if (album.albumArtUri != null) {
+    val painter = if (album.albumArtUri != "null") {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
-        painterResource(id = R.drawable.test_cover)
+        painterResource(id = R.drawable.album_cover_palceholer_v2)
     }
 
     Column (modifier = Modifier

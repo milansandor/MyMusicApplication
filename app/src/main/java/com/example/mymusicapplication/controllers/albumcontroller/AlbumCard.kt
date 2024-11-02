@@ -35,10 +35,10 @@ fun AlbumCard(
     modifier: Modifier,
     selectedSong: Song?,
 ) {
-    val painter = if (album.albumArtUri != null) {
+    val painter = if (album.albumArtUri != "null") {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
-        painterResource(id = R.drawable.test_cover)
+        painterResource(id = R.drawable.album_cover_palceholer_v2)
     }
     val configuration = LocalConfiguration.current
     val screenWidth = configuration.screenWidthDp.dp
