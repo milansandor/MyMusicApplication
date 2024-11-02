@@ -29,7 +29,7 @@ fun SongTagsContainer(
     genres: List<String>,
 ) {
     Text(
-        text = "Existing tags:",
+        text = "Songs' tags:",
         fontWeight = FontWeight.Bold,
     )
 

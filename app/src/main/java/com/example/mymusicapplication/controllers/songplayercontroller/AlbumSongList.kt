@@ -19,8 +19,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
@@ -136,15 +134,8 @@ fun SongCard(
     onClick: () -> Unit,
     onTagAdded: (String) -> Unit
 ) {
-    var expanded by remember {
-        mutableStateOf(false)
-    }
-    var showInputDialog by remember {
-        mutableStateOf(false)
-    }
-    var newTag by remember {
-        mutableStateOf("")
-    }
+    var showInputDialog by remember { mutableStateOf(false) }
+    var newTag by remember { mutableStateOf("") }
 
     val backgroundColor by animateColorAsState(
         if (isSelected) Color.Green else Color.Transparent, label = ""
@@ -195,24 +186,9 @@ fun SongCard(
             Icons.Default.MoreVert, contentDescription = "song edit",
             modifier = Modifier
                 .clickable {
-                    expanded = true
-                }
-        )
-
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = {
-                    Text(text = "Add Tag")
-                },
-                onClick = {
-                    expanded = false
                     showInputDialog = true
                 }
-            )
-        }
+        )
 
         if (showInputDialog) {
             Log.i("ADD_TAG_TO_SONG", "${song.title}")
