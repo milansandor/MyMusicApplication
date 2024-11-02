@@ -188,8 +188,6 @@ fun SongManagerComposable(
                     tint = Color.White
                 )
             }
-
-//            TagSearchButton(onClick = onTagSearchClick)
         }
     }
 }

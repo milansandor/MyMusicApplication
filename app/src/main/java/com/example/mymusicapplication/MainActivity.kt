@@ -262,6 +262,7 @@ fun MainApplication(albums: List<Album>, context: Context) {
                     AlbumSongList(
                         context = context,
                         album = selectedAlbum!!,
+                        tags = tags,
                         onBackPress = {
                             selectedAlbum = null
                         },

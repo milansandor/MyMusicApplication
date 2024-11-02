@@ -50,6 +50,7 @@ import com.example.mymusicapplication.screens.TagInputDialog
 fun AlbumSongList(
     context: Context,
     album: Album,
+    tags: List<String>,
     onBackPress: () -> Unit,
     onSongClicked: (Song) -> Unit,
     selectedSong: Song?,
@@ -93,13 +94,6 @@ fun AlbumSongList(
             }
         }
 
-        var currentSongId by remember {
-            mutableStateOf<Long?>(null)
-        }
-        var currentSongTitle by remember {
-            mutableStateOf<String?>(null)
-        }
-
         val sortedSongs = album.songs.sortedBy { it.track.toInt() }
 
         LazyColumn {
@@ -110,18 +104,16 @@ fun AlbumSongList(
                     song = song,
                     isPlaying = isPlaying,
                     isSelected = song == selectedSong,
+                    genre = album.genre,
+                    tags = tags,
                     onClick = {
                         if (isPlaying) {
                             stopCurrentSong()
                             onIsSongCurrentlyPlayingChange(false)
-                            currentSongId = null
-                            currentSongTitle = null
                         } else {
                             playSong(song)
                             onSongClicked(song)
                             onIsSongCurrentlyPlayingChange(true)
-                            currentSongId = song.id
-                            currentSongTitle = song.title
                         }
                     },
                     onTagAdded = { newTag ->
@@ -137,6 +129,8 @@ fun AlbumSongList(
 fun SongCard(
     context: Context,
     song: Song,
+    genre: String,
+    tags: List<String>,
     isPlaying: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -225,6 +219,8 @@ fun SongCard(
             TagInputDialog(
                 context = context,
                 song = song,
+                genre = genre,
+                tags = tags,
                 onDismiss = {
                     showInputDialog = false
                 },

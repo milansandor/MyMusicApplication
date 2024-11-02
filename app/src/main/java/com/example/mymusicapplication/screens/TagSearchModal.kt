@@ -215,20 +215,6 @@ fun TagItem(
     }
 }
 
-/*@Composable()
-fun TagSearchButton(onClick: () -> Unit) {
-    IconButton(
-        onClick = onClick
-    ) {
-        Icon(
-            painterResource(id = R.drawable.search_icon_white),
-            "",
-            modifier = Modifier.size(14.dp),
-            tint = Color.White
-        )
-    }
-}*/
-
 val mockTags = listOf("rock", "pop", "jazz")
 val mockCheckTags = mockTags.map { it to true }.toMap()
 @Preview(showBackground = true)
