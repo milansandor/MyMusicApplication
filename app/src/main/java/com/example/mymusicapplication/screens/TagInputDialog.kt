@@ -1,6 +1,7 @@
 package com.example.mymusicapplication.screens
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -9,22 +10,29 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.example.mymusicapplication.controllers.getSongFromMediaStore
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.AvailableTags
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.SongTag
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.SongTagsContainer
+import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.MusicRepository
 import com.example.mymusicapplication.models.Song
+import kotlinx.coroutines.launch
 
 @Composable
 fun TagInputDialog(
@@ -33,12 +41,19 @@ fun TagInputDialog(
     genre: String,
     tags: List<String>,
     onDismiss: () -> Unit,
-    onTagAdded: (String) -> Unit
+    onTagAdded: (String) -> Unit,
+    onSongUpdated: (Song) -> Unit
 ) {
-    var tagInput by remember { mutableStateOf("") } // State to hold the input value
-    val musicRepository = MusicRepository(context = context)
-    var listOfGenre = genre.split(";")
-    var availableTags = tags.filter { !listOfGenre.contains(it) }
+    val songTags = remember { mutableStateListOf<String>().apply { addAll(genre.split(";")) } }
+    val selectedTags = remember { mutableStateListOf<String>() }
+
+    val scope = rememberCoroutineScope()
+
+    val availableTags by remember(songTags, tags) {
+        derivedStateOf {
+            tags.filter { it.isNotBlank() && !songTags.contains(it) }
+        }
+    }
 
 
     AlertDialog(
@@ -49,20 +64,39 @@ fun TagInputDialog(
                 modifier = Modifier
                     .fillMaxHeight()
             ) {
-                SongTagsContainer(genres = listOfGenre)
-                AvailableTags(tags = availableTags)
+                SongTagsContainer(
+                    songTags = songTags,
+                    onTagRemoved = { tag ->
+                        songTags.remove(tag)
+                    }
+                )
+                AvailableTags(
+                    tags = availableTags,
+                    selectedTags = selectedTags,
+                )
             }
         },
         confirmButton = {
             Button(
                 onClick = {
-                    if (tagInput.isNotBlank()) {
-                        onTagAdded(";$tagInput") // Call the callback to add the tag
-                        musicRepository.setNewGenreForSong(song.id, tagInput)
+                    scope.launch {
+                        val newTags = (songTags + selectedTags).distinct()
+                        val newTagString = newTags.joinToString(";")
+                        updateGenre(context, song.id, song.data, newTagString)
+
+                        // Retrieve the updated song data
+                        val updatedSong = getSongFromMediaStore(context, song.id)
+                        Log.d("updatedSong", "the updated song is ${updatedSong.toString()}")
+                        if (updatedSong != null) {
+                            onSongUpdated(updatedSong)
+                        }
+
+                        onDismiss()
                     }
-                }
+                },
+                enabled = true
             ) {
-                Text("Save")
+                Text("Apply tags")
             }
         },
         dismissButton = {

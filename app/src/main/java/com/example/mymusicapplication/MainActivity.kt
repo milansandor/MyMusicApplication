@@ -304,7 +304,8 @@ fun MainApplication(albums: List<Album>, context: Context) {
                         isSongCurrentlyPlaying = isSongPlaying,
                         onIsSongCurrentlyPlayingChange = { newValue ->
                             isSongPlaying = newValue
-                        }
+                        },
+                        onTagAdded = onAddTag,
                     )
                 }
             }

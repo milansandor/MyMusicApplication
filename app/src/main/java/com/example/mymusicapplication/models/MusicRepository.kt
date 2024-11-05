@@ -8,6 +8,12 @@ import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
+import android.widget.Toast
+import com.example.mymusicapplication.controllers.readGenreFromFile
+import com.mpatric.mp3agic.ID3v24Tag
+import com.mpatric.mp3agic.Mp3File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileNotFoundException
 
@@ -38,9 +44,9 @@ class MusicRepository(private val context: Context) {
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
                 val duration = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-                val genre = getGenreForSong(id)
+                val genre = readGenreFromFile(data)
 
-                val song = Song(id, finalTrackNumber, title, artist, album, duration, data)
+                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre)
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
@@ -121,7 +127,7 @@ class MusicRepository(private val context: Context) {
     }
 
     @SuppressLint("Range")
-    public fun setNewGenreForSong(songId: Long, newTag: String) {
+    fun setNewGenreForSong(songId: Long, newTag: String) {
         val uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId.toInt())
         val cursor = context.contentResolver.query(uri, null, null, null, null)
         var genre: String = "Unknown"

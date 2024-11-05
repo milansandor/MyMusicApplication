@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,8 +54,11 @@ fun AlbumSongList(
     onSongClicked: (Song) -> Unit,
     selectedSong: Song?,
     isSongCurrentlyPlaying: Boolean,
-    onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
+    onIsSongCurrentlyPlayingChange: (Boolean) -> Unit,
+    onTagAdded: (String) -> Unit
 ) {
+    val songsState = remember { mutableStateListOf<Song>().apply { addAll(album.songs) } }
+
     val painter = if (album.albumArtUri != "null") {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
@@ -102,7 +106,7 @@ fun AlbumSongList(
                     song = song,
                     isPlaying = isPlaying,
                     isSelected = song == selectedSong,
-                    genre = album.genre,
+                    genre = song.genre,
                     tags = tags,
                     onClick = {
                         if (isPlaying) {
@@ -115,7 +119,13 @@ fun AlbumSongList(
                         }
                     },
                     onTagAdded = { newTag ->
-                        println("New tag added: $newTag")
+                        onTagAdded(newTag)
+                    },
+                    onSongUpdated = { updatedSong ->
+                        val index = songsState.indexOfFirst { it.id == updatedSong.id }
+                        if (index != -1) {
+                            songsState[index] = updatedSong
+                        }
                     }
                 )
             }
@@ -132,10 +142,10 @@ fun SongCard(
     isPlaying: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
-    onTagAdded: (String) -> Unit
+    onTagAdded: (String) -> Unit,
+    onSongUpdated: (Song) -> Unit
 ) {
     var showInputDialog by remember { mutableStateOf(false) }
-    var newTag by remember { mutableStateOf("") }
 
     val backgroundColor by animateColorAsState(
         if (isSelected) Color.Green else Color.Transparent, label = ""
@@ -178,7 +188,6 @@ fun SongCard(
             }
         }
 
-        // Spacer pushing the icon to the far right
         Spacer(modifier = Modifier.width(16.dp))
 
         // MoreVert icon
@@ -191,7 +200,6 @@ fun SongCard(
         )
 
         if (showInputDialog) {
-            Log.i("ADD_TAG_TO_SONG", "${song.title}")
             TagInputDialog(
                 context = context,
                 song = song,
@@ -202,8 +210,10 @@ fun SongCard(
                 },
                 onTagAdded = { tag ->
                     onTagAdded(tag)
+                },
+                onSongUpdated = { updatedSong ->
+                    onSongUpdated(updatedSong)
                     showInputDialog = false
-                    newTag = ""
                 }
             )
         }
