@@ -3,18 +3,10 @@ package com.example.mymusicapplication.models
 import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import android.util.Log
-import android.widget.Toast
 import com.example.mymusicapplication.controllers.readGenreFromFile
-import com.mpatric.mp3agic.ID3v24Tag
-import com.mpatric.mp3agic.Mp3File
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
 import java.io.FileNotFoundException
 
 class MusicRepository(private val context: Context) {
@@ -29,15 +21,15 @@ class MusicRepository(private val context: Context) {
         val cursor = contentResolver.query(uri, null, selection, null, sortOrder)
         cursor?.use { c ->
             val albumMap = mutableMapOf<String, Pair<String, MutableList<Song>>>()
-            val genreMap = mutableMapOf<Long, String>()
+            val genreMap = mutableMapOf<String, MutableSet<String>>()
 
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val trackNumber = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
                 val finalTrackNumber = if (trackNumber.length > 3) {
-                    trackNumber.takeLast(2)
+                    trackNumber.takeLast(2).toInt()
                 } else {
-                    trackNumber
+                    trackNumber.toInt()
                 }
                 val title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
                 val artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
@@ -50,9 +42,10 @@ class MusicRepository(private val context: Context) {
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
+                    genreMap[album]?.add(genre)
                 } else {
                     albumMap[album] = Pair(artist, mutableListOf(song))
-                    genreMap[id] = genre
+                    genreMap[album] = mutableSetOf(genre)
                 }
             }
 
@@ -64,7 +57,7 @@ class MusicRepository(private val context: Context) {
                 } else {
                     null
                 }
-                val genre = genreMap[songs.first().id] ?: "Unknown"
+                val genre = genreMap[albumName]?.joinToString(";") ?: "Unknown"
                 val album = Album(albumName, artist, songs, albumArtPath.toString(), genre, 0)
                 albums.add(album)
             }
@@ -109,39 +102,5 @@ class MusicRepository(private val context: Context) {
             }
         }
         return null
-    }
-
-    @SuppressLint("Range")
-    private fun getGenreForSong(songId: Long): String {
-        val uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId.toInt())
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        var genre: String = "Unknown"
-
-        cursor?.use {
-            if (it.moveToFirst()) {
-                genre = it.getString(it.getColumnIndex(MediaStore.Audio.Genres.NAME))
-            }
-        }
-
-        return genre
-    }
-
-    @SuppressLint("Range")
-    fun setNewGenreForSong(songId: Long, newTag: String) {
-        val uri = MediaStore.Audio.Genres.getContentUriForAudioId("external", songId.toInt())
-        val cursor = context.contentResolver.query(uri, null, null, null, null)
-        var genre: String = "Unknown"
-
-        cursor?.use {
-            if (it.moveToFirst()) {
-                genre = it.getString(it.getColumnIndex(MediaStore.Audio.Genres.NAME))
-            }
-        }
-
-        val contentValues = ContentValues().apply {
-            put(MediaStore.Audio.Genres.NAME, "$genre;$newTag")
-        }
-
-        context.contentResolver.update(uri, contentValues, null, null)
     }
 }

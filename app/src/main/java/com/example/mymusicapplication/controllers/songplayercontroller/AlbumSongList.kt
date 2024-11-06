@@ -1,7 +1,6 @@
 package com.example.mymusicapplication.controllers.songplayercontroller
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -172,7 +171,7 @@ fun SongCard(
             ) {
                 // Track text
                 Text(
-                    text = song.track,
+                    text = song.track.toString(),
                     modifier = Modifier
                         .padding(end = 8.dp) // Padding to separate track from title
                 )

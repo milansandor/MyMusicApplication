@@ -55,7 +55,6 @@ import com.example.mymusicapplication.screens.PermissionViewModel
 import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.screens.ReadMediaAudioPermissionTextProvider
 import com.example.mymusicapplication.screens.ReadMediaImagesPermissionTextProvider
-import com.example.mymusicapplication.screens.ReadMediaVisualUserSelectedPermissionTextProvider
 import com.example.mymusicapplication.screens.TagSearchModal
 import com.example.mymusicapplication.screens.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
@@ -183,9 +182,19 @@ fun MainApplication(albums: List<Album>, context: Context) {
     var isSongPlaying by remember { mutableStateOf(false) }
 
     // tags and checked tags
-    val tags = remember {
-        mutableStateListOf(*albums.map { it.genre }.distinct().toTypedArray())
+    /*val tags = remember {
+        mutableStateListOf(*albums.flatMap { it.genre.split(';') }.distinct().toTypedArray())
+    }*/
+    val genreTags = mutableSetOf<String>()
+    albums.forEach { album ->
+        genreTags.addAll(album.genre.split(';'))
     }
+
+    val tags = remember {
+        mutableStateListOf(*genreTags.toTypedArray())
+    }
+    Log.i("album tags", "${tags.toList()}")
+
     val checkedTags = remember { mutableStateMapOf<String, Boolean>() }
 
     LaunchedEffect(tags) {

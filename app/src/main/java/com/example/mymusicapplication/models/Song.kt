@@ -2,7 +2,7 @@ package com.example.mymusicapplication.models
 
 data class Song(
     val id: Long,
-    val track: String,
+    val track: Int,
     val title: String,
     val artist: String,
     val album: String,
