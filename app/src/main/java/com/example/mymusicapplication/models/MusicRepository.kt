@@ -6,6 +6,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.compose.runtime.mutableStateOf
 import com.example.mymusicapplication.controllers.readGenreFromFile
 import java.io.FileNotFoundException
 
@@ -38,14 +39,16 @@ class MusicRepository(private val context: Context) {
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
                 val genre = readGenreFromFile(data)
 
-                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre)
+                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = mutableStateOf(genre))
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
-                    genreMap[album]?.add(genre)
+                    // Add all genres (splitting by ";") and make sure it's unique by using a MutableSet
+                    genreMap[album]?.addAll(genre.split(";").map { it.trim() })
                 } else {
                     albumMap[album] = Pair(artist, mutableListOf(song))
-                    genreMap[album] = mutableSetOf(genre)
+                    // Initialize the genre map with the first set of genres, ensuring uniqueness
+                    genreMap[album] = mutableSetOf(*genre.split(";").map { it.trim() }.toTypedArray())
                 }
             }
 
@@ -58,7 +61,7 @@ class MusicRepository(private val context: Context) {
                     null
                 }
                 val genre = genreMap[albumName]?.joinToString(";") ?: "Unknown"
-                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre, 0)
+                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre = mutableStateOf(genre), 0)
                 albums.add(album)
             }
         }

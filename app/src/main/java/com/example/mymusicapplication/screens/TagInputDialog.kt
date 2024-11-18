@@ -14,10 +14,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.example.mymusicapplication.controllers.getGenre
 import com.example.mymusicapplication.controllers.getSongFromMediaStore
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.AvailableTags
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.SongTagsContainer
 import com.example.mymusicapplication.controllers.updateGenre
+import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 import kotlinx.coroutines.launch
 
@@ -27,6 +29,7 @@ fun TagInputDialog(
     song: Song,
     genre: String,
     tags: List<String>,
+    album: Album,
     onDismiss: () -> Unit,
     onTagAdded: (String) -> Unit,
     onSongUpdated: (Song) -> Unit
@@ -70,13 +73,25 @@ fun TagInputDialog(
                         val newTags = (songTags + selectedTags).distinct()
                         val newTagString = newTags.joinToString(";")
                         updateGenre(context, song.id, song.data, newTagString)
+                        val updatedGenre = getGenre(context, song.id)
 
-                        // Retrieve the updated song data
-                        val updatedSong = getSongFromMediaStore(context, song.id)
-                        Log.d("updatedSong", "the updated song is ${updatedSong.toString()}")
-                        if (updatedSong != null) {
-                            onSongUpdated(updatedSong)
+                        song.genre.value = updatedGenre
+                        val checkGenreExistList = album.genre.value.split(";").toMutableList()
+                        newTags.forEach {
+                            if (!checkGenreExistList.contains(it)) {
+                                checkGenreExistList.add(it)
+                            }
                         }
+
+                        val songGenresInAlbum = album.songs.flatMap { it.genre.value.split(";").map { it.trim() } }.toSet()
+
+                        checkGenreExistList.removeAll { genre -> genre !in songGenresInAlbum }
+
+                        album.genre.value = checkGenreExistList.joinToString(";")
+
+                        Log.d("UPDATED_SONG", song.toString())
+                        Log.d("UPDATED_AlBUM_GENRE", album.genre.value)
+                        Log.d("UPDATED_SONG_GENRE_ITEMS", selectedTags.joinToString(";"))
 
                         onDismiss()
                     }

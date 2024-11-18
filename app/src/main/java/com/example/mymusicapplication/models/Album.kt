@@ -1,10 +1,12 @@
 package com.example.mymusicapplication.models
 
+import androidx.compose.runtime.MutableState
+
 data class Album(
     val albumName: String,
     val artistName: String,
-    val songs: List<Song>,
+    var songs: List<Song>,
     val albumArtUri: String?,
-    val genre: String,
+    var genre: MutableState<String>,
     var lastVisited: Long,
 )

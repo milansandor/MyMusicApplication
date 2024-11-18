@@ -182,12 +182,9 @@ fun MainApplication(albums: List<Album>, context: Context) {
     var isSongPlaying by remember { mutableStateOf(false) }
 
     // tags and checked tags
-    /*val tags = remember {
-        mutableStateListOf(*albums.flatMap { it.genre.split(';') }.distinct().toTypedArray())
-    }*/
     val genreTags = mutableSetOf<String>()
     albums.forEach { album ->
-        genreTags.addAll(album.genre.split(';'))
+        genreTags.addAll(album.genre.value.split(';'))
     }
 
     val tags = remember {
@@ -218,7 +215,7 @@ fun MainApplication(albums: List<Album>, context: Context) {
     }
 
     val onSongEnd: () -> Unit = {
-        val songList = currentlyPlayingAlbum?.songs?.sortedBy { it.track.toInt() } ?: emptyList()
+        val songList = currentlyPlayingAlbum?.songs?.sortedBy { it.track } ?: emptyList()
         val currentIndex = songList.indexOfFirst { it.title == selectedSong?.title }
         val nextIndex = currentIndex + 1
         if (nextIndex < songList.size) {
@@ -240,7 +237,7 @@ fun MainApplication(albums: List<Album>, context: Context) {
         albums
     } else {
         albums.filter { album ->
-            activeTags.all { tag -> album.genre.contains(tag) }
+            activeTags.all { tag -> album.genre.value.contains(tag) }
         }
     }
 

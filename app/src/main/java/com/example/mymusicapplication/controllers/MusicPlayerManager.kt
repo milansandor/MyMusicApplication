@@ -7,6 +7,7 @@ import android.media.MediaScannerConnection
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
+import androidx.compose.runtime.mutableStateOf
 import com.example.mymusicapplication.models.Song
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -102,6 +103,35 @@ fun readGenreFromFile(filePath: String): String {
     }
 }
 
+fun getGenre(context: Context, songId: Long): String {
+    var genre = ""
+    val projection = arrayOf(
+        MediaStore.Audio.Media._ID,
+        MediaStore.Audio.Media.DATA
+    )
+    val selection = "${MediaStore.Audio.Media._ID} = ?"
+    val selectionArgs = arrayOf(songId.toString())
+    val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+
+    context.contentResolver.query(
+        uri,
+        projection,
+        selection,
+        selectionArgs,
+        null
+    )?.use { cursor ->
+        if (cursor.moveToFirst()) {
+            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
+            val data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+            genre = readGenreFromFile(data)
+        } else {
+            genre = "Unknown"
+        }
+    }
+    Log.i("GET_GENRE", "genre: $genre")
+    return genre
+}
+
 suspend fun getSongFromMediaStore(context: Context, songId: Long): Song? {
     return withContext(Dispatchers.IO) {
         val projection = arrayOf(
@@ -139,7 +169,7 @@ suspend fun getSongFromMediaStore(context: Context, songId: Long): Song? {
                 val data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
                 val genre = readGenreFromFile(data)
 
-                Song(id, finalTrackNumber, title, artist, album, duration, data, genre)
+                Song(id, finalTrackNumber, title, artist, album, duration, data, genre = mutableStateOf(genre))
             } else {
                 null
             }

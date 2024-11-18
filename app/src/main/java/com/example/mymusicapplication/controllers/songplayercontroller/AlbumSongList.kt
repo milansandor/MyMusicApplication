@@ -105,8 +105,9 @@ fun AlbumSongList(
                     song = song,
                     isPlaying = isPlaying,
                     isSelected = song == selectedSong,
-                    genre = song.genre,
+                    genre = song.genre.value,
                     tags = tags,
+                    album = album,
                     onClick = {
                         if (isPlaying) {
                             stopCurrentSong()
@@ -138,6 +139,7 @@ fun SongCard(
     song: Song,
     genre: String,
     tags: List<String>,
+    album: Album,
     isPlaying: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
@@ -204,6 +206,7 @@ fun SongCard(
                 song = song,
                 genre = genre,
                 tags = tags,
+                album = album,
                 onDismiss = {
                     showInputDialog = false
                 },
