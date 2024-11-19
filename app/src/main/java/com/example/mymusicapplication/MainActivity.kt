@@ -35,6 +35,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,8 +49,10 @@ import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.controllers.songplayercontroller.AlbumSongList
 import com.example.mymusicapplication.controllers.songplayercontroller.SongManagerComposable
 import com.example.mymusicapplication.controllers.stopCurrentSong
+import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
+import com.example.mymusicapplication.models.SongUpdateInfo
 import com.example.mymusicapplication.screens.PermissionDialog
 import com.example.mymusicapplication.screens.PermissionViewModel
 import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
@@ -58,6 +61,7 @@ import com.example.mymusicapplication.screens.ReadMediaImagesPermissionTextProvi
 import com.example.mymusicapplication.screens.TagSearchModal
 import com.example.mymusicapplication.screens.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
 
@@ -180,6 +184,7 @@ fun MainApplication(albums: List<Album>, context: Context) {
     var selectedSong by remember { mutableStateOf<Song?>(null) }
     var isModalOpen by remember { mutableStateOf(false) }
     var isSongPlaying by remember { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
 
     // tags and checked tags
     val genreTags = mutableSetOf<String>()
@@ -210,8 +215,66 @@ fun MainApplication(albums: List<Album>, context: Context) {
     }
 
     val onRemoveTag: (String) -> Unit = { tag ->
+        // Create a list to store the relevant song information
+        val songsToUpdate = mutableListOf<SongUpdateInfo>()
+
+        // Loop through each album and each song to check which songs have the tag
+        albums.forEach { album ->
+            album.songs.forEach { song ->
+                val songGenres = song.genre.value.split(";").map { it.trim() }
+                if (songGenres.contains(tag)) {
+                    // If the song's genre contains the tag, prepare updated genre and add to the list
+                    val updatedGenre = song.genre.value
+                        .split(";")
+                        .filter { it.trim() != tag } // Remove the tag from the genre
+                        .joinToString(";")
+
+                    // Add song id, data, and updated genre to the list
+                    songsToUpdate.add(SongUpdateInfo(song.id, song.data, updatedGenre))
+                }
+            }
+        }
+
+        // Now remove the tag from the tags and checkedTags lists
         tags.remove(tag)
         checkedTags.remove(tag)
+
+        // Call updateGenre for the list of songs to update
+        if (songsToUpdate.isNotEmpty()) {
+            // Pass the list of songs to the updateGenre function
+            scope.launch {
+                updateGenre(context = context, songsToUpdate = songsToUpdate)
+            }
+        }
+
+        // Update the genre in the album
+        albums.forEach { album ->
+            // Split the album's genre and filter out the removed tag
+            val updatedGenres = album.genre.value
+                .split(";")
+                .filter { it.trim() != tag }
+                .joinToString(";")
+
+            // Update the album's genre value
+            album.genre.value = updatedGenres
+        }
+
+        // Update the genre in each song of the album
+        albums.forEach { album ->
+            album.songs.forEach { song ->
+                // Filter out the removed tag from the song's genre
+                val updatedSongGenres = song.genre.value
+                    .split(";")
+                    .filter { it.trim() != tag }
+                    .joinToString(";")
+
+                // Update the song's genre value
+                song.genre.value = updatedSongGenres
+            }
+        }
+
+        // Optional: you might want to log the changes for debugging
+        Log.i("TAG_REMOVAL", "Removed tag: $tag")
     }
 
     val onSongEnd: () -> Unit = {
