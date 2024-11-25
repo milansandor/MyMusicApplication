@@ -32,12 +32,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mymusicapplication.models.Album
 
 
 @Composable
 fun TagSearchModal(
-    albums: List<Album>,
     tags: List<String>,
     checkedTags: Map<String, Boolean>,
     onCheckedTagChange: (String, Boolean) -> Unit,
@@ -46,8 +44,6 @@ fun TagSearchModal(
     onAddTag: (String) -> Unit,
     onRemoveTag: (String) -> Unit
 ) {
-//    val tags = albums.map { it.genre }.distinct()
-
     if (isModalOpen) {
         TagListModal(
             onDismiss = onDismiss,

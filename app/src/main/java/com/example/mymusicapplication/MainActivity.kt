@@ -338,7 +338,6 @@ fun MainApplication(albums: List<Album>, context: Context) {
         ) {
             if (selectedAlbum == null) {
                 TagSearchModal(
-                    albums = albums,
                     tags = tags,
                     checkedTags = checkedTags,
                     onCheckedTagChange = { tag, isChecked ->

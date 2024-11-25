@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.MoreVert
@@ -98,12 +99,11 @@ fun AlbumSongList(
         val sortedSongs = album.songs.sortedBy { it.track.toInt() }
 
         LazyColumn {
-            items(sortedSongs) {song ->
+            itemsIndexed(sortedSongs) {index, song ->
                 val isPlaying = song == selectedSong && isSongCurrentlyPlaying
                 SongCard(
                     context = context,
                     song = song,
-                    isPlaying = isPlaying,
                     isSelected = song == selectedSong,
                     genre = song.genre.value,
                     tags = tags,
@@ -126,7 +126,8 @@ fun AlbumSongList(
                         if (index != -1) {
                             songsState[index] = updatedSong
                         }
-                    }
+                    },
+                    showMoreVertIcon = index == 0
                 )
             }
         }
@@ -140,11 +141,11 @@ fun SongCard(
     genre: String,
     tags: List<String>,
     album: Album,
-    isPlaying: Boolean,
     isSelected: Boolean,
     onClick: () -> Unit,
     onTagAdded: (String) -> Unit,
-    onSongUpdated: (Song) -> Unit
+    onSongUpdated: (Song) -> Unit,
+    showMoreVertIcon: Boolean
 ) {
     var showInputDialog by remember { mutableStateOf(false) }
 
@@ -192,13 +193,15 @@ fun SongCard(
         Spacer(modifier = Modifier.width(16.dp))
 
         // MoreVert icon
-        Icon(
-            Icons.Default.MoreVert, contentDescription = "song edit",
-            modifier = Modifier
-                .clickable {
-                    showInputDialog = true
-                }
-        )
+        if (showMoreVertIcon) {
+            Icon(
+                Icons.Default.MoreVert, contentDescription = "song edit",
+                modifier = Modifier
+                    .clickable {
+                        showInputDialog = true
+                    }
+            )
+        }
 
         if (showInputDialog) {
             TagInputDialog(

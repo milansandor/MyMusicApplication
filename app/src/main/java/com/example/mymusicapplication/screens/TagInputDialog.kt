@@ -5,8 +5,6 @@ import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.mymusicapplication.controllers.getGenre
-import com.example.mymusicapplication.controllers.getSongFromMediaStore
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.AvailableTags
 import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.SongTagsContainer
 import com.example.mymusicapplication.controllers.updateGenre
@@ -114,12 +111,13 @@ fun TagInputDialog(
                     scope.launch {
                         val newTags = (songTags + selectedTags).distinct()
                         val newTagString = newTags.joinToString(";")
-                        updateGenre(context,
-                            listOf(SongUpdateInfo(song.id, song.data, newTagString))
-                        )
-                        val updatedGenre = getGenre(context, song.id)
+                        val updatedAlbumSongsInfo = mutableListOf<SongUpdateInfo>()
+                        album.songs.forEach { song ->
+                            updatedAlbumSongsInfo.add(SongUpdateInfo(song.id, song.data, newTagString))
+                            song.genre.value = newTagString
+                        }
+                        updateGenre(context, updatedAlbumSongsInfo)
 
-                        song.genre.value = updatedGenre
                         val checkGenreExistList = album.genre.value.split(";").toMutableList()
                         newTags.forEach {
                             if (!checkGenreExistList.contains(it)) {
