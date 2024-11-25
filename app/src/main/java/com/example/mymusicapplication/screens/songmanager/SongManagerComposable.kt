@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.controllers.songplayercontroller
+package com.example.mymusicapplication.screens.songmanager
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
@@ -38,7 +38,7 @@ fun SongManagerComposable(
     isSongCurrentlyPlaying: Boolean,
     onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
 ) {
-    val sortedSongs = currentlyPlayingAlbum?.songs?.sortedBy { it.track.toInt() }
+    val sortedSongs = currentlyPlayingAlbum?.songs?.sortedBy { it.track }
     var songList = listOf<Song>()
     if (currentlyPlayingAlbum != null) {
         if (sortedSongs != null) {

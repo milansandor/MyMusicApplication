@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.controllers.albumcontroller
+package com.example.mymusicapplication.screens.albumslist
 
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.height
@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.example.mymusicapplication.screens.albumslist.components.AlbumCard
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 

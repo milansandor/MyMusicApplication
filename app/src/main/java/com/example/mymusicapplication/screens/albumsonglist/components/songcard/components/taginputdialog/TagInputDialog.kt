@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens
+package com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog
 
 import android.content.Context
 import android.util.Log
@@ -24,13 +24,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.mymusicapplication.controllers.getGenre
-import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.AvailableTags
-import com.example.mymusicapplication.controllers.songplayercontroller.songTagController.SongTagsContainer
 import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
+import com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags.AvailableTags
+import com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer.SongTagsContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -125,7 +124,7 @@ fun TagInputDialog(
                             }
                         }
 
-                        val songGenresInAlbum = album.songs.flatMap { it.genre.value.split(";").map { it.trim() } }.toSet()
+                        val songGenresInAlbum = album.songs.flatMap { song -> song.genre.value.split(";").map { it.trim() } }.toSet()
 
                         checkGenreExistList.removeAll { genre -> genre !in songGenresInAlbum }
 

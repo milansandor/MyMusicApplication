@@ -174,7 +174,7 @@ suspend fun updateGenre(context: Context, songsToUpdate: List<SongUpdateInfo>) {
                 tempFile.delete()
 
                 // Trigger media scan and suspend until scan is complete
-                suspendCoroutine<Unit> { continuation ->
+                suspendCoroutine { continuation ->
                     MediaScannerConnection.scanFile(context, arrayOf(songInfo.data), arrayOf("audio/mpeg")) { path, uri ->
                         Log.d("MediaScanner", "Scanned $path:")
                         continuation.resume(Unit)

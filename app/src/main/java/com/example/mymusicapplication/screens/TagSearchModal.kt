@@ -206,10 +206,7 @@ fun TagItem(
     }
 }
 
-val mockTags = listOf("rock", "pop", "jazz")
-val mockCheckTags = mockTags.map { it to true }.toMap()
 @Preview(showBackground = true)
 @Composable
 fun TagListPreview() {
-//    TagListModal(onDismiss = {false}, mockTags, mockCheckTags)
 }
