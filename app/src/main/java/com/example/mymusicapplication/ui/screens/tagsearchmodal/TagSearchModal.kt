@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens
+package com.example.mymusicapplication.ui.screens.tagsearchmodal
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

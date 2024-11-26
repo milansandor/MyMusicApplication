@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog
+package com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog
 
 import android.content.Context
 import android.util.Log
@@ -28,8 +28,8 @@ import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
-import com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags.AvailableTags
-import com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer.SongTagsContainer
+import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags.AvailableTags
+import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer.SongTagsContainer
 import kotlinx.coroutines.launch
 
 @Composable

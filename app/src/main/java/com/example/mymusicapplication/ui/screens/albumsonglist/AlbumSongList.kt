@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist
+package com.example.mymusicapplication.ui.screens.albumsonglist
 
 import android.content.Context
 import androidx.compose.foundation.layout.Column
@@ -20,8 +20,8 @@ import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
-import com.example.mymusicapplication.screens.albumsonglist.components.albumheader.AlbumHeader
-import com.example.mymusicapplication.screens.albumsonglist.components.songcard.SongCard
+import com.example.mymusicapplication.ui.screens.albumsonglist.components.albumheader.AlbumHeader
+import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.SongCard
 
 @Composable
 fun AlbumSongList(

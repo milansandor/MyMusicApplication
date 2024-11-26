@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumslist.components
+package com.example.mymusicapplication.ui.screens.albumslist.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

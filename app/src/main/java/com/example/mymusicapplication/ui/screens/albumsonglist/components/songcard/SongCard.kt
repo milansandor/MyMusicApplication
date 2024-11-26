@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist.components.songcard
+package com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard
 
 import android.content.Context
 import androidx.compose.animation.animateColorAsState
@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
-import com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.TagInputDialog
+import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.TagInputDialog
 
 @Composable
 fun SongCard(

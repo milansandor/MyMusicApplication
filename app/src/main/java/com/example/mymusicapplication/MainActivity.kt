@@ -18,20 +18,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mymusicapplication.screens.MainApplication
-import com.example.mymusicapplication.screens.PermissionDialog
-import com.example.mymusicapplication.viewmodels.PermissionViewModel
-import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
-import com.example.mymusicapplication.screens.ReadMediaAudioPermissionTextProvider
-import com.example.mymusicapplication.screens.ReadMediaImagesPermissionTextProvider
-import com.example.mymusicapplication.screens.WriteExternalStoragePermissionTextProvider
+import com.example.mymusicapplication.ui.screens.MainApplication
+import com.example.mymusicapplication.ui.screens.permission.PermissionDialog
+import com.example.mymusicapplication.ui.screens.permission.ReadExternalStoragePermissionTextProvider
+import com.example.mymusicapplication.ui.screens.permission.ReadMediaAudioPermissionTextProvider
+import com.example.mymusicapplication.ui.screens.permission.ReadMediaImagesPermissionTextProvider
+import com.example.mymusicapplication.ui.screens.permission.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
+import com.example.mymusicapplication.viewmodels.MusicViewModel
 
 class MainActivity : ComponentActivity() {
 
@@ -63,10 +62,9 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             MyMusicApplicationTheme {
-                val viewModel = viewModel<PermissionViewModel>()
+                val viewModel = viewModel<MusicViewModel>()
                 val dialogQueue = viewModel.visiblePermissionDialogQueue
                 val isPermissionsGranted by viewModel.isPermissionGranted
-                val albums by viewModel.albums.collectAsState()
 
                 val permissionResultLauncher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.RequestMultiplePermissions(),
@@ -81,7 +79,7 @@ class MainActivity : ComponentActivity() {
                 )
 
                 if (isPermissionsGranted) {
-                    MainApplication(albums = albums, context = this@MainActivity)
+                    MainApplication(musicViewModel = viewModel, context = this@MainActivity)
                 } else {
                     Column(
                         modifier = Modifier.fillMaxSize(),

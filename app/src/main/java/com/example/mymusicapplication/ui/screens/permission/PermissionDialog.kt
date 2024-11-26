@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens
+package com.example.mymusicapplication.ui.screens.permission
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth

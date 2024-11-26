@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags
+package com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer

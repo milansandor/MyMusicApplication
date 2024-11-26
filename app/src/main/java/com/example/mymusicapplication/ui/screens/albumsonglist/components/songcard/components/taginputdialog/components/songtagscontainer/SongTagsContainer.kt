@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer
+package com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer
 
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyColumn

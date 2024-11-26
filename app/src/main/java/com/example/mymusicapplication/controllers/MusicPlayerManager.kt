@@ -103,35 +103,6 @@ fun readGenreFromFile(filePath: String): String {
     }
 }
 
-fun getGenre(context: Context, songId: Long): String {
-    var genre = ""
-    val projection = arrayOf(
-        MediaStore.Audio.Media._ID,
-        MediaStore.Audio.Media.DATA
-    )
-    val selection = "${MediaStore.Audio.Media._ID} = ?"
-    val selectionArgs = arrayOf(songId.toString())
-    val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-
-    context.contentResolver.query(
-        uri,
-        projection,
-        selection,
-        selectionArgs,
-        null
-    )?.use { cursor ->
-        if (cursor.moveToFirst()) {
-            val id = cursor.getLong(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
-            val data = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-            genre = readGenreFromFile(data)
-        } else {
-            genre = "Unknown"
-        }
-    }
-    Log.i("GET_GENRE", "genre: $genre")
-    return genre
-}
-
 suspend fun updateGenre(context: Context, songsToUpdate: List<SongUpdateInfo>) {
     withContext(Dispatchers.IO) {
         try {
@@ -166,7 +137,7 @@ suspend fun updateGenre(context: Context, songsToUpdate: List<SongUpdateInfo>) {
                 context.contentResolver.openOutputStream(uri, "rwt")?.use { output ->
                     tempFile.inputStream().use { input ->
                         input.copyTo(output)
-                        Log.i("UPDATE_GENRE", "genre updated successfully to $output")
+                        Log.i("UPDATE_GENRE", "genre updated successfully to ${tempFile.name}")
                     }
                 } ?: throw IOException("Unable to write MP3 file")
 

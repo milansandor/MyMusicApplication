@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.songmanager
+package com.example.mymusicapplication.ui.screens.songmanager
 
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement

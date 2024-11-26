@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens.albumsonglist.components.albumheader
+package com.example.mymusicapplication.ui.screens.albumsonglist.components.albumheader
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
