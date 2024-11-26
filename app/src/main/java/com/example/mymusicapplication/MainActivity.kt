@@ -26,7 +26,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mymusicapplication.screens.MainApplication
 import com.example.mymusicapplication.screens.PermissionDialog
-import com.example.mymusicapplication.screens.PermissionViewModel
+import com.example.mymusicapplication.viewmodels.PermissionViewModel
 import com.example.mymusicapplication.screens.ReadExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.screens.ReadMediaAudioPermissionTextProvider
 import com.example.mymusicapplication.screens.ReadMediaImagesPermissionTextProvider

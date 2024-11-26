@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.screens
+package com.example.mymusicapplication.viewmodels
 
 import android.Manifest
 import android.app.Application

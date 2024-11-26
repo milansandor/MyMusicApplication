@@ -9,4 +9,5 @@ data class Album(
     val albumArtUri: String?,
     var genre: MutableState<String>,
     var lastVisited: Long,
+    var isSelectedAlbum: Boolean = false
 )
