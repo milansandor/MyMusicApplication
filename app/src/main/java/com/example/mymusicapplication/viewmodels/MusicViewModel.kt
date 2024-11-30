@@ -34,13 +34,7 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         get() {
             val perms = mutableListOf<String>()
             when {
-                Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-//                    perms.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
-                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
-                }
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
                     perms.add(Manifest.permission.READ_MEDIA_AUDIO)
                 }
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
@@ -88,14 +82,14 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         // Loop through each album and each song to check which songs have the tag
         albums.value.forEach { album ->
             album.songs.forEach { song ->
-                val songGenres = song.genre.value.split(";").map { it.trim() }
+                val songGenres = song.genre.split(";").map { it.trim() }
                 if (songGenres.contains(tag)) {
-                    val updatedGenre = song.genre.value
+                    val updatedGenre = song.genre
                         .split(";")
                         .filter { it.trim() != tag } // Remove the tag from the genre
                         .joinToString(";")
 
-                    songsToUpdate.add(SongUpdateInfo(song.id, song.data, updatedGenre))
+                    songsToUpdate.add(SongUpdateInfo(song.id, song.data.toString(), updatedGenre))
                 }
             }
         }
@@ -113,21 +107,21 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
 
         // Update the genre in the album
         albums.value.forEach { album ->
-            val updatedGenres = album.genre.value
+            val updatedGenres = album.genre
                 .split(";")
                 .filter { it.trim() != tag }
                 .joinToString(";")
-            album.genre.value = updatedGenres
+            album.genre = updatedGenres
         }
 
         // Update the genre in each song of the album
         albums.value.forEach { album ->
             album.songs.forEach { song ->
-                val updatedSongGenres = song.genre.value
+                val updatedSongGenres = song.genre
                     .split(";")
                     .filter { it.trim() != tag }
                     .joinToString(";")
-                song.genre.value = updatedSongGenres
+                song.genre = updatedSongGenres
             }
         }
 
@@ -189,7 +183,9 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
     private fun updateTagsFromAlbums() {
         val genreTags = mutableSetOf<String>()
         _albums.value.forEach { album ->
-            genreTags.addAll(album.genre.value.split(';'))
+            album.genre.split(';').filter { it.isNotBlank() }.forEach { genre ->
+                genreTags.add(genre)
+            }
         }
         tags.addAll(genreTags)
         tags.forEach { tag ->

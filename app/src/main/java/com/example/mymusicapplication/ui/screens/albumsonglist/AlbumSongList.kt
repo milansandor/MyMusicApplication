@@ -61,7 +61,7 @@ fun AlbumSongList(
                     context = context,
                     song = song,
                     isSelected = song == selectedSong,
-                    genre = song.genre.value,
+                    genre = song.genre,
                     tags = tags,
                     album = album,
                     onClick = {

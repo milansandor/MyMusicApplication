@@ -60,7 +60,7 @@ fun MainApplication(
         albums
     } else {
         albums.filter { album ->
-            activeTags.all { tag -> album.genre.value.contains(tag) }
+            activeTags.all { tag -> album.genre.contains(tag) }
         }
     }
 

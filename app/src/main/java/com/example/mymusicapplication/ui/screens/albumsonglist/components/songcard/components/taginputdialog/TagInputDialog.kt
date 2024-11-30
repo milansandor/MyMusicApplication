@@ -113,25 +113,25 @@ fun TagInputDialog(
                         val updatedAlbumSongsInfo = mutableListOf<SongUpdateInfo>()
                         album.songs.forEach { song ->
                             updatedAlbumSongsInfo.add(SongUpdateInfo(song.id, song.data, newTagString))
-                            song.genre.value = newTagString
+                            song.genre = newTagString
                         }
                         updateGenre(context, updatedAlbumSongsInfo)
 
-                        val checkGenreExistList = album.genre.value.split(";").toMutableList()
+                        val checkGenreExistList = album.genre.split(";").toMutableList()
                         newTags.forEach {
                             if (!checkGenreExistList.contains(it)) {
                                 checkGenreExistList.add(it)
                             }
                         }
 
-                        val songGenresInAlbum = album.songs.flatMap { song -> song.genre.value.split(";").map { it.trim() } }.toSet()
+                        val songGenresInAlbum = album.songs.flatMap { song -> song.genre.split(";").map { it.trim() } }.toSet()
 
                         checkGenreExistList.removeAll { genre -> genre !in songGenresInAlbum }
 
-                        album.genre.value = checkGenreExistList.joinToString(";")
+                        album.genre = checkGenreExistList.joinToString(";")
 
                         Log.d("UPDATED_SONG", song.toString())
-                        Log.d("UPDATED_AlBUM_GENRE", album.genre.value)
+                        Log.d("UPDATED_AlBUM_GENRE", album.genre)
                         Log.d("UPDATED_SONG_GENRE_ITEMS", newTags.joinToString(";"))
 
                         onDismiss()

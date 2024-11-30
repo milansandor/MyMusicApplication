@@ -38,13 +38,7 @@ class MainActivity : ComponentActivity() {
         get() {
             val perms = mutableListOf<String>()
             when {
-                /*Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
-//                    perms.add(Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED)
-                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
-                    perms.add(Manifest.permission.READ_MEDIA_AUDIO)
-                }*/
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
-                    perms.add(Manifest.permission.READ_MEDIA_IMAGES)
                     perms.add(Manifest.permission.READ_MEDIA_AUDIO)
                 }
                 Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> {
@@ -103,19 +97,16 @@ class MainActivity : ComponentActivity() {
                         PermissionDialog(
                             permissionTextProvider =
                                 when (permission) {
-                                    /*Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED -> {
-                                        ReadMediaVisualUserSelectedPermissionTextProvider()
-                                    }*/
                                     Manifest.permission.READ_MEDIA_AUDIO -> {
                                         ReadMediaAudioPermissionTextProvider()
-                                    }
-                                    Manifest.permission.READ_MEDIA_IMAGES -> {
-                                        ReadMediaImagesPermissionTextProvider()
                                     }
                                     Manifest.permission.READ_EXTERNAL_STORAGE -> {
                                         ReadExternalStoragePermissionTextProvider()
                                     }
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
+                                        WriteExternalStoragePermissionTextProvider()
+                                    }
+                                    Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
                                         WriteExternalStoragePermissionTextProvider()
                                     }
                                     else -> return@forEach

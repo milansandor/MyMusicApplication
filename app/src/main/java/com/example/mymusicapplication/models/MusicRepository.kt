@@ -27,11 +27,7 @@ class MusicRepository(private val context: Context) {
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val trackNumber = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
-                val finalTrackNumber = if (trackNumber.length > 3) {
-                    trackNumber.takeLast(2).toInt()
-                } else {
-                    trackNumber.toInt()
-                }
+                val finalTrackNumber = trackNumber?.toIntOrNull() ?: 0
                 val title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
                 val artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
@@ -39,7 +35,7 @@ class MusicRepository(private val context: Context) {
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
                 val genre = readGenreFromFile(data)
 
-                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = mutableStateOf(genre))
+                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = genre)
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
@@ -61,7 +57,7 @@ class MusicRepository(private val context: Context) {
                     null
                 }
                 val genre = genreMap[albumName]?.joinToString(";") ?: "Unknown"
-                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre = mutableStateOf(genre), 0)
+                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre = genre)
                 albums.add(album)
             }
         }

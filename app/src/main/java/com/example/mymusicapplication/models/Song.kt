@@ -1,6 +1,7 @@
 package com.example.mymusicapplication.models
 
-import androidx.compose.runtime.MutableState
+import android.net.Uri
+
 
 data class Song(
     val id: Long,
@@ -10,5 +11,5 @@ data class Song(
     val album: String,
     val duration: Long,
     val data: String,
-    var genre: MutableState<String>,
+    var genre: String,
 )

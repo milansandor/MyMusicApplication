@@ -4,6 +4,7 @@ import android.content.ContentUris
 import android.content.Context
 import android.media.MediaPlayer
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
