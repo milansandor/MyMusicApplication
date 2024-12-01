@@ -48,7 +48,7 @@ fun TagInputDialog(
     onSongUpdated: (Song) -> Unit,
     musicViewModel: MusicViewModel
 ) {
-    val songTags = remember { mutableStateListOf<String>().apply { addAll(genre.split(";")) } }
+    val songTags = remember { mutableStateListOf<String>().apply { addAll(song.genre.split(";")) } }
     val selectedTags = remember { mutableStateListOf<String>() }
     val newTag = remember { mutableStateOf("") }
 
@@ -124,7 +124,12 @@ fun TagInputDialog(
             Button(
                 onClick = {
                     scope.launch {
-                        val newTags = (songTags + selectedTags).distinct()
+                        val newTags = if (songTags.isNotEmpty()) {
+                            (songTags + selectedTags).distinct()
+                        } else {
+                            selectedTags.distinct()
+                        }
+
                         val newTagString = newTags.joinToString(";")
                         val updatedAlbumSongsInfo = mutableListOf<SongUpdateInfo>()
                         album.songs.forEach { song ->

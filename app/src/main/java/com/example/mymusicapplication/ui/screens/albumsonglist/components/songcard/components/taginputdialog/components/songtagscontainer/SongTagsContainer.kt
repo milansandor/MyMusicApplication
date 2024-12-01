@@ -22,7 +22,9 @@ fun SongTagsContainer(
     LazyColumn(
         modifier = Modifier.heightIn(max = 150.dp),
     ) {
-        items(songTags) {tag ->
+        val filteredTags = songTags.filter { it.isNotEmpty() }
+
+        items(filteredTags) {tag ->
             SongTag(
                 tag = tag,
                 onTagRemoved = onTagRemoved
