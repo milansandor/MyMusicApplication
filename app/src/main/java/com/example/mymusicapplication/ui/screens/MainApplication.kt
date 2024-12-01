@@ -134,6 +134,7 @@ fun MainApplication(
                             musicViewModel.isSongPlaying = newValue
                         },
                         onTagAdded = onAddGenreTag,
+                        musicViewModel = musicViewModel,
                     )
                 }
             }

@@ -39,11 +39,9 @@ class MusicRepository(private val context: Context) {
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
-                    // Add all genres (splitting by ";") and make sure it's unique by using a MutableSet
                     genreMap[album]?.addAll(genre.split(";").map { it.trim() })
                 } else {
                     albumMap[album] = Pair(artist, mutableListOf(song))
-                    // Initialize the genre map with the first set of genres, ensuring uniqueness
                     genreMap[album] = mutableSetOf(*genre.split(";").map { it.trim() }.toTypedArray())
                 }
             }

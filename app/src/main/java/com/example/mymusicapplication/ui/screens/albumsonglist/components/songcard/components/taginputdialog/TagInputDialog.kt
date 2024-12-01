@@ -1,7 +1,10 @@
 package com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog
 
+import android.app.Activity
 import android.content.Context
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,6 +33,7 @@ import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
 import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.availabletags.AvailableTags
 import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.components.songtagscontainer.SongTagsContainer
+import com.example.mymusicapplication.viewmodels.MusicViewModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -41,11 +45,23 @@ fun TagInputDialog(
     album: Album,
     onDismiss: () -> Unit,
     onTagAdded: (String) -> Unit,
-    onSongUpdated: (Song) -> Unit
+    onSongUpdated: (Song) -> Unit,
+    musicViewModel: MusicViewModel
 ) {
     val songTags = remember { mutableStateListOf<String>().apply { addAll(genre.split(";")) } }
     val selectedTags = remember { mutableStateListOf<String>() }
     val newTag = remember { mutableStateOf("") }
+
+    val recoverablePermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.StartIntentSenderForResult(),
+        onResult = { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                musicViewModel.retryPendingOperation()
+            } else {
+                Log.e("MainActivity", "User declined permission request")
+            }
+        }
+    )
 
     val scope = rememberCoroutineScope()
 
@@ -115,7 +131,8 @@ fun TagInputDialog(
                             updatedAlbumSongsInfo.add(SongUpdateInfo(song.id, song.data, newTagString))
                             song.genre = newTagString
                         }
-                        updateGenre(context, updatedAlbumSongsInfo)
+
+                        updateGenre(context, updatedAlbumSongsInfo, recoverablePermissionLauncher)
 
                         val checkGenreExistList = album.genre.split(";").toMutableList()
                         newTags.forEach {

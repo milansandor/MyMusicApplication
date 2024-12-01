@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.components.taginputdialog.TagInputDialog
+import com.example.mymusicapplication.viewmodels.MusicViewModel
 
 @Composable
 fun SongCard(
@@ -40,7 +41,8 @@ fun SongCard(
     onClick: () -> Unit,
     onTagAdded: (String) -> Unit,
     onSongUpdated: (Song) -> Unit,
-    showMoreVertIcon: Boolean
+    showMoreVertIcon: Boolean,
+    musicViewModel: MusicViewModel
 ) {
     var showInputDialog by remember { mutableStateOf(false) }
 
@@ -114,7 +116,8 @@ fun SongCard(
                 onSongUpdated = { updatedSong ->
                     onSongUpdated(updatedSong)
                     showInputDialog = false
-                }
+                },
+                musicViewModel = musicViewModel
             )
         }
     }

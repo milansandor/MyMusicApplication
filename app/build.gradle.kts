@@ -61,7 +61,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.coil.compose)
     implementation(libs.androidx.runtime.livedata)
-    implementation(libs.mp3agic)
     implementation(libs.jaudiotagger)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

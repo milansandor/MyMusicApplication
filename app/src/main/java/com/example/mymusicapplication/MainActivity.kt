@@ -27,7 +27,6 @@ import com.example.mymusicapplication.ui.screens.MainApplication
 import com.example.mymusicapplication.ui.screens.permission.PermissionDialog
 import com.example.mymusicapplication.ui.screens.permission.ReadExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.screens.permission.ReadMediaAudioPermissionTextProvider
-import com.example.mymusicapplication.ui.screens.permission.ReadMediaImagesPermissionTextProvider
 import com.example.mymusicapplication.ui.screens.permission.WriteExternalStoragePermissionTextProvider
 import com.example.mymusicapplication.ui.theme.MyMusicApplicationTheme
 import com.example.mymusicapplication.viewmodels.MusicViewModel

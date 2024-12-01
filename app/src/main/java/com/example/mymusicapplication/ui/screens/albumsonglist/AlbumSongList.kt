@@ -22,6 +22,7 @@ import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.ui.screens.albumsonglist.components.albumheader.AlbumHeader
 import com.example.mymusicapplication.ui.screens.albumsonglist.components.songcard.SongCard
+import com.example.mymusicapplication.viewmodels.MusicViewModel
 
 @Composable
 fun AlbumSongList(
@@ -33,7 +34,8 @@ fun AlbumSongList(
     selectedSong: Song?,
     isSongCurrentlyPlaying: Boolean,
     onIsSongCurrentlyPlayingChange: (Boolean) -> Unit,
-    onTagAdded: (String) -> Unit
+    onTagAdded: (String) -> Unit,
+    musicViewModel: MusicViewModel
 ) {
     val songsState = remember { mutableStateListOf<Song>().apply { addAll(album.songs) } }
 
@@ -83,7 +85,8 @@ fun AlbumSongList(
                             songsState[index] = updatedSong
                         }
                     },
-                    showMoreVertIcon = index == 0
+                    showMoreVertIcon = index == 0,
+                    musicViewModel = musicViewModel
                 )
             }
         }

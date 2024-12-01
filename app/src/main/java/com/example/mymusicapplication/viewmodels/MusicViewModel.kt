@@ -16,11 +16,11 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.stopCurrentSong
-import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.MusicRepository
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
+import com.example.mymusicapplication.controllers.updateGenre
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 
 class MusicViewModel(application: Application): AndroidViewModel(application) {
     private val musicRepository = MusicRepository(application)
+    private var pendingOperation: (() -> Unit)? = null
 
     private val requiredPermissions: List<String>
         get() {
@@ -65,6 +66,16 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
 
     init {
         checkAllPermissionsGranted()
+    }
+
+    // modification operations
+    fun setPendingOperation(operation: () -> Unit) {
+        pendingOperation = operation
+    }
+
+    fun retryPendingOperation() {
+        pendingOperation?.invoke()
+        pendingOperation = null
     }
 
     // tag management
