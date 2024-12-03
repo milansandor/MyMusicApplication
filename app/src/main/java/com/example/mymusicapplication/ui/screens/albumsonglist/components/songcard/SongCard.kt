@@ -72,6 +72,7 @@ fun SongCard(
                 // Track text
                 Text(
                     text = song.track.toString(),
+                    color = Color.Black,
                     modifier = Modifier
                         .padding(end = 8.dp) // Padding to separate track from title
                 )
@@ -79,6 +80,7 @@ fun SongCard(
                 // Title text
                 Text(
                     text = song.title,
+                    color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -96,7 +98,8 @@ fun SongCard(
                 modifier = Modifier
                     .clickable {
                         showInputDialog = true
-                    }
+                    },
+                tint = Color.Black
             )
         }
 

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -42,8 +43,9 @@ fun AlbumHeader(
                 text = albumName,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
+                color = Color.Black
             )
-            Text(text = artistName)
+            Text(text = artistName, color = Color.Black)
         }
     }
 }

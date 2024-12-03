@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import coil.compose.rememberAsyncImagePainter
 import com.example.mymusicapplication.R
@@ -49,7 +50,7 @@ fun AlbumSongList(
         .fillMaxSize()
     ) {
         IconButton(onClick = onBackPress) {
-            Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+            Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.Black)
         }
 
         AlbumHeader(albumCover = painter, albumName = album.albumName, artistName = album.artistName)

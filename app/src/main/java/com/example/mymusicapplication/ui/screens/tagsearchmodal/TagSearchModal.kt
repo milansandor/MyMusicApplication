@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun TagSearchModal(
     tags: List<String>,
+    remainingTags: List<String>,
     checkedTags: Map<String, Boolean>,
     onCheckedTagChange: (String, Boolean) -> Unit,
     isModalOpen: Boolean,
@@ -48,6 +49,7 @@ fun TagSearchModal(
         TagListModal(
             onDismiss = onDismiss,
             tags = tags,
+            remainingTags = remainingTags,
             checkedTags = checkedTags,
             onCheckedTagChange = onCheckedTagChange,
             onAddTag = onAddTag,
@@ -60,6 +62,7 @@ fun TagSearchModal(
 fun TagListModal(
     onDismiss: () -> Unit,
     tags: List<String>,
+    remainingTags: List<String>,
     checkedTags: Map<String, Boolean>,
     onCheckedTagChange: (String, Boolean) -> Unit,
     onAddTag: (String) -> Unit,
@@ -83,6 +86,7 @@ fun TagListModal(
             }
             TagList(
                 tags = tags,
+                remainingTags = remainingTags,
                 checkedTags = checkedTags,
                 onCheckedTagChange = onCheckedTagChange,
                 onAddTag = onAddTag,
@@ -130,6 +134,7 @@ fun TagAddButton(
 @Composable
 fun TagList(
     tags: List<String>,
+    remainingTags: List<String>,
     checkedTags: Map<String, Boolean>,
     onCheckedTagChange: (String, Boolean) -> Unit,
     onAddTag: (String) -> Unit,
@@ -145,7 +150,7 @@ fun TagList(
                 .fillMaxSize()
                 .padding(bottom = 60.dp)
         ) {
-            items(tags) { tag ->
+            items(if (remainingTags.isNotEmpty()) remainingTags else tags) { tag ->
                 TagItem(
                     tag = tag,
                     isChecked = checkedTags[tag] ?: false,

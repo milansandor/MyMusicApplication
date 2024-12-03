@@ -53,7 +53,7 @@ fun AlbumCard(
         Column(
             modifier = Modifier
                 .background(color = Color.White)
-                .height(120.dp)
+                .height(140.dp)
         ) {
             Image(
                 painter = painter,
@@ -82,12 +82,14 @@ fun AlbumCard(
                     fontWeight = FontWeight.Bold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    color = Color.Black,
                 )
                 Text(
                     text = album.artistName,
                     fontSize = 8.sp,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
+                    color = Color.Black,
                 )
             }
         }

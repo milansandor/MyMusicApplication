@@ -27,7 +27,12 @@ class MusicRepository(private val context: Context) {
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
                 val trackNumber = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TRACK))
-                val finalTrackNumber = trackNumber?.toIntOrNull() ?: 0
+                val convertedTrackNumber = trackNumber?.toIntOrNull() ?: 0
+                val finalTrackNumber = if (convertedTrackNumber > 999) {
+                    convertedTrackNumber - 1000
+                } else {
+                    convertedTrackNumber
+                }
                 val title = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.TITLE))
                 val artist = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ARTIST))
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))

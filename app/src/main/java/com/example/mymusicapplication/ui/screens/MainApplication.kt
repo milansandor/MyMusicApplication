@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -24,6 +25,7 @@ import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.ui.screens.albumsonglist.AlbumSongList
 import com.example.mymusicapplication.ui.screens.songmanager.SongManagerComposable
 import com.example.mymusicapplication.controllers.stopCurrentSong
+import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.ui.screens.tagsearchmodal.TagSearchModal
 import com.example.mymusicapplication.viewmodels.MusicViewModel
 
@@ -64,7 +66,23 @@ fun MainApplication(
         }
     }
 
+    // Filter albums that match all checked tags
+    val matchedAlbums = albums.filter { album ->
+        activeTags.all { tag -> album.genre.split(";").contains(tag) }
+    }
+
+    // Get all genres from the matched albums
+    val additionalGenres = matchedAlbums
+        .flatMap { it.genre.split(";") } // Split genres into a flat list
+        .filter { tag -> tag.isNotBlank() } // Exclude empty or blank tags
+        .distinct() // Ensure unique genres
+        .filter { tag -> !checkedTags.getOrDefault(tag, false) }// Exclude already checked tags
+
+    // Combine checked tags and additional genres
+    val listedTags = (activeTags + additionalGenres).distinct()
+
     Scaffold(
+        modifier = Modifier.background(Color.White),
         bottomBar = {
             BottomAppBar(
                 modifier = Modifier
@@ -99,6 +117,7 @@ fun MainApplication(
             if (musicViewModel.selectedAlbum == null) {
                 TagSearchModal(
                     tags = tags,
+                    remainingTags = listedTags,
                     checkedTags = checkedTags,
                     onCheckedTagChange = { tag, isChecked ->
                         checkedTags[tag] = isChecked
@@ -141,3 +160,9 @@ fun MainApplication(
         }
     }
 }
+fun getRemainingTags(
+    filteredAlbums: List<Album>,
+    checkedTags: SnapshotStateMap<String, Boolean>
+) = filteredAlbums.map { it.genre }
+    .distinct()
+    .filter { tag -> !checkedTags.getOrDefault(tag, false) }
