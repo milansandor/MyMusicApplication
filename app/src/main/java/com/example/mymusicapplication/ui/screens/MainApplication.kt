@@ -50,6 +50,10 @@ fun MainApplication(
         musicViewModel.onRemoveTag(tag, context, scope)
     }
 
+    val onModifyTagName: (String, String) -> Unit = { oldName, newName ->
+        musicViewModel.onModifyTagName(oldName, newName, context, scope)
+    }
+
     val onSongEnd: () -> Unit = {
         musicViewModel.onSongEnd(context, scope)
     }
@@ -127,7 +131,8 @@ fun MainApplication(
                     isModalOpen = musicViewModel.isTagSearchModalOpen,
                     onDismiss = { musicViewModel.isTagSearchModalOpen = false },
                     onAddTag = onAddGenreTag,
-                    onRemoveTag = onRemoveTag
+                    onRemoveTag = onRemoveTag,
+                    onModifyTagName = onModifyTagName
                 )
             }
 

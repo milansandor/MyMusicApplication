@@ -86,6 +86,67 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
+    fun onModifyTagName(oldTag: String, newTag: String, context: Context, scope: CoroutineScope) {
+        val songsToUpdate = mutableListOf<SongUpdateInfo>()
+
+        // Loop through each album and each song to check which songs have the old tag
+        albums.value.forEach { album ->
+            album.songs.forEach { song ->
+                val songGenres = song.genre.split(";").map { it.trim() }
+                if (songGenres.contains(oldTag)) {
+                    val updatedGenre = songGenres
+                        .map { if (it == oldTag) newTag else it }  // Replace oldTag with newTag
+                        .joinToString(";")
+
+                    // Add this song to the update list
+                    songsToUpdate.add(SongUpdateInfo(song.id, song.data.toString(), updatedGenre))
+                }
+            }
+        }
+
+        val oldTagIndex = tags.indexOf(oldTag)
+        if (oldTagIndex != -1) {
+            tags[oldTagIndex] = newTag
+        }
+
+        val oldCheckedValue = checkedTags[oldTag]
+        if (oldCheckedValue != null) {
+            checkedTags.remove(oldTag)
+            checkedTags[newTag] = oldCheckedValue
+        }
+
+        if (songsToUpdate.isNotEmpty()) {
+            scope.launch {
+                updateGenre(context = context, songsToUpdate = songsToUpdate)
+            }
+        }
+
+        // Update the genre in each album
+        albums.value.forEach { album ->
+            val updatedGenres = album.genre
+                .split(";")
+                .map { it.trim() }
+                .map { if (it == oldTag) newTag else it }  // Replace oldTag with newTag
+                .joinToString(";")
+            album.genre = updatedGenres
+        }
+
+        // Update the genre in each song of each album
+        albums.value.forEach { album ->
+            album.songs.forEach { song ->
+                val updatedSongGenres = song.genre
+                    .split(";")
+                    .map { it.trim() }
+                    .map { if (it == oldTag) newTag else it }
+                    .joinToString(";")
+                song.genre = updatedSongGenres
+            }
+        }
+
+        // Optional: log the changes for debugging
+        Log.i("TAG_MODIFICATION", "Modified tag: $oldTag to $newTag")
+
+    }
     fun onRemoveTag(tag: String, context: Context, scope: CoroutineScope) {
         // Create a list to store the relevant song information
         val songsToUpdate = mutableListOf<SongUpdateInfo>()
@@ -109,13 +170,6 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         tags.remove(tag)
         checkedTags.remove(tag)
 
-        // Call updateGenre for the list of songs to update
-        if (songsToUpdate.isNotEmpty()) {
-            scope.launch {
-                updateGenre(context = context, songsToUpdate = songsToUpdate)
-            }
-        }
-
         // Update the genre in the album
         albums.value.forEach { album ->
             val updatedGenres = album.genre
@@ -133,6 +187,13 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
                     .filter { it.trim() != tag }
                     .joinToString(";")
                 song.genre = updatedSongGenres
+            }
+        }
+
+        // Call updateGenre for the list of songs to update
+        if (songsToUpdate.isNotEmpty()) {
+            scope.launch {
+                updateGenre(context = context, songsToUpdate = songsToUpdate)
             }
         }
 
