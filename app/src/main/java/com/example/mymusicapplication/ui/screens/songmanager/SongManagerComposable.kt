@@ -35,6 +35,7 @@ fun SongManagerComposable(
     currentlyPlayingAlbum: Album?,
     onSongChange: (Song) -> Unit,
     onTagSearchClick: () -> Unit,
+    isTagSearchModalOpen: Boolean,
     isSongCurrentlyPlaying: Boolean,
     onIsSongCurrentlyPlayingChange: (Boolean) -> Unit
 ) {
@@ -109,7 +110,7 @@ fun SongManagerComposable(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Tag Search",
+                    text = if (isTagSearchModalOpen) "Start search" else "Tag Search",
                     color = Color.White,
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Bold,

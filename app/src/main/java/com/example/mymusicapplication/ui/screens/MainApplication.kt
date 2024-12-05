@@ -101,6 +101,7 @@ fun MainApplication(
                         Log.i("NEW_SONG", "$newSong")
                     },
                     onTagSearchClick = { musicViewModel.isTagSearchModalOpen = !musicViewModel.isTagSearchModalOpen },
+                    isTagSearchModalOpen = musicViewModel.isTagSearchModalOpen,
                     isSongCurrentlyPlaying = musicViewModel.isSongPlaying,
                     onIsSongCurrentlyPlayingChange = { newValue ->
                         musicViewModel.isSongPlaying = newValue

@@ -15,6 +15,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -150,7 +151,7 @@ fun TagList(
                 .fillMaxSize()
                 .padding(bottom = 60.dp)
         ) {
-            items(if (remainingTags.isNotEmpty()) remainingTags else tags) { tag ->
+            items(if (remainingTags.isNotEmpty()) remainingTags.sortedBy { it.lowercase() } else tags.sortedBy { it.lowercase() }) { tag ->
                 TagItem(
                     tag = tag,
                     isChecked = checkedTags[tag] ?: false,
@@ -181,6 +182,8 @@ fun TagItem(
     onCheckedChange: (Boolean) -> Unit,
     onRemoveTag: () -> Unit,
 ) {
+    var showDeleteDialog by remember { mutableStateOf(false) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
@@ -200,12 +203,36 @@ fun TagItem(
             )
         }
         IconButton(
-            onClick = { onRemoveTag() }
+            onClick = { showDeleteDialog = true }
         ) {
             Icon(
                 imageVector = Icons.Default.Close,
                 contentDescription = "",
                 modifier = Modifier.size(12.dp),
+            )
+        }
+
+        if (showDeleteDialog) {
+            AlertDialog(
+                title = { Text(text = "Delete Tag") },
+                text = { Text(text = "Are you sure you want to delete this tag?") },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            onRemoveTag()
+                            showDeleteDialog = false
+                        }) {
+                        Text(text = "Yes")
+                    }
+                },
+                dismissButton = {
+                    TextButton(
+                        onClick = { showDeleteDialog = false }
+                    ) {
+                        Text(text = "No")
+                    }
+                },
+                onDismissRequest = { showDeleteDialog = false },
             )
         }
     }
