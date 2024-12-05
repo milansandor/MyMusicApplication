@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -29,7 +30,7 @@ import com.example.mymusicapplication.viewmodels.MusicViewModel
 fun AlbumSongList(
     context: Context,
     album: Album,
-    tags: List<String>,
+    tags: SnapshotStateList<String>,
     onBackPress: () -> Unit,
     onSongClicked: (Song) -> Unit,
     selectedSong: Song?,
@@ -77,9 +78,7 @@ fun AlbumSongList(
                             onIsSongCurrentlyPlayingChange(true)
                         }
                     },
-                    onTagAdded = { newTag ->
-                        onTagAdded(newTag)
-                    },
+                    onTagAdded = onTagAdded,
                     onSongUpdated = { updatedSong ->
                         val index = songsState.indexOfFirst { it.id == updatedSong.id }
                         if (index != -1) {

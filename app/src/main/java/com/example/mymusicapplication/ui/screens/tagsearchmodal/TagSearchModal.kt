@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Edit
@@ -190,7 +189,7 @@ fun TagList(
 
 @Composable
 fun TagItem(
-    tag: String, 
+    tag: String,
     isChecked: Boolean, 
     onCheckedChange: (Boolean) -> Unit,
     onRemoveTag: () -> Unit,

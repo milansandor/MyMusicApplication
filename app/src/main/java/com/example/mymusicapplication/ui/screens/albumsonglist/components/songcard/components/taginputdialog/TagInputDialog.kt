@@ -24,6 +24,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -41,7 +42,7 @@ fun TagInputDialog(
     context: Context,
     song: Song,
     genre: String,
-    tags: List<String>,
+    tags: SnapshotStateList<String>,
     album: Album,
     onDismiss: () -> Unit,
     onTagAdded: (String) -> Unit,
@@ -51,6 +52,7 @@ fun TagInputDialog(
     val songTags = remember { mutableStateListOf<String>().apply { addAll(song.genre.split(";")) } }
     val selectedTags = remember { mutableStateListOf<String>() }
     val newTag = remember { mutableStateOf("") }
+    val brandNewTags = remember { mutableStateListOf<String>() }
 
     val recoverablePermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -84,6 +86,9 @@ fun TagInputDialog(
                     songTags = songTags,
                     onTagRemoved = { tag ->
                         songTags.remove(tag)
+                        if (brandNewTags.contains(tag)) {
+                            brandNewTags.remove(tag)
+                        }
                     }
                 )
 
@@ -101,7 +106,7 @@ fun TagInputDialog(
                         onClick = {
                             if (newTag.value.isNotBlank() && !songTags.contains(newTag.value)) {
                                 songTags.add(newTag.value)
-                                onTagAdded(newTag.value)
+                                brandNewTags.add(newTag.value)
                                 newTag.value = "" // Clear the input field after adding
                             }
                         }
@@ -144,6 +149,10 @@ fun TagInputDialog(
                             if (!checkGenreExistList.contains(it)) {
                                 checkGenreExistList.add(it)
                             }
+                        }
+
+                        brandNewTags.forEach { tag ->
+                            onTagAdded(tag)
                         }
 
                         val songGenresInAlbum = album.songs.flatMap { song -> song.genre.split(";").map { it.trim() } }.toSet()
