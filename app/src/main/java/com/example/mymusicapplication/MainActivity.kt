@@ -80,7 +80,6 @@ class MainActivity : ComponentActivity() {
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Button(onClick = {
-                            // TODO: implement optional access to images
                             permissionResultLauncher.launch(
                                 permissionsToRequest
                             )
