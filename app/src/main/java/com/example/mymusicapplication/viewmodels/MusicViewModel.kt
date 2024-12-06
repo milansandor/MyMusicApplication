@@ -22,10 +22,12 @@ import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
 import com.example.mymusicapplication.controllers.updateGenre
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MusicViewModel(application: Application): AndroidViewModel(application) {
     private val musicRepository = MusicRepository(application)
@@ -66,6 +68,58 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
 
     init {
         checkAllPermissionsGranted()
+    }
+
+    fun dismissDialog() {
+        visiblePermissionDialogQueue.removeFirst()
+        checkAllPermissionsGranted()
+    }
+
+    fun onPermissionResult(
+        permission: String,
+        isGranted: Boolean
+    ) {
+        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
+            visiblePermissionDialogQueue.add(permission)
+        }
+
+        checkAllPermissionsGranted()
+    }
+
+    // Checks if all required permissions are granted.
+    private fun checkAllPermissionsGranted() {
+        val context = getApplication<Application>().applicationContext
+        isPermissionGranted.value = requiredPermissions.all { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
+
+        if (isPermissionGranted.value) {
+            loadMusic()
+        }
+    }
+
+    private fun loadMusic() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val albumList = musicRepository.getAllMusic()
+            _albums.value = albumList
+
+            updateTagsFromAlbums()
+        }
+    }
+
+    private fun updateTagsFromAlbums() {
+        val genreTags = mutableSetOf<String>()
+        _albums.value.forEach { album ->
+            album.genre.split(';').filter { it.isNotBlank() }.forEach { genre ->
+                genreTags.add(genre)
+            }
+        }
+        tags.addAll(genreTags)
+        tags.forEach { tag ->
+            if (checkedTags[tag] == null) {
+                checkedTags[tag] = false
+            }
+        }
     }
 
     // modification operations
@@ -212,58 +266,6 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         } else {
             stopCurrentSong()
             selectedSong = null
-        }
-    }
-
-    fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
-        checkAllPermissionsGranted()
-    }
-
-    fun onPermissionResult(
-        permission: String,
-        isGranted: Boolean
-    ) {
-        if (!isGranted && !visiblePermissionDialogQueue.contains(permission)) {
-            visiblePermissionDialogQueue.add(permission)
-        }
-
-        checkAllPermissionsGranted()
-    }
-
-    // Checks if all required permissions are granted.
-    private fun checkAllPermissionsGranted() {
-        val context = getApplication<Application>().applicationContext
-        isPermissionGranted.value = requiredPermissions.all { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (isPermissionGranted.value) {
-            loadMusic()
-        }
-    }
-
-    private fun loadMusic() {
-        viewModelScope.launch {
-            val albumList = musicRepository.getAllMusic()
-            _albums.value = albumList
-
-            updateTagsFromAlbums()
-        }
-    }
-
-    private fun updateTagsFromAlbums() {
-        val genreTags = mutableSetOf<String>()
-        _albums.value.forEach { album ->
-            album.genre.split(';').filter { it.isNotBlank() }.forEach { genre ->
-                genreTags.add(genre)
-            }
-        }
-        tags.addAll(genreTags)
-        tags.forEach { tag ->
-            if (checkedTags[tag] == null) {
-                checkedTags[tag] = false
-            }
         }
     }
 }

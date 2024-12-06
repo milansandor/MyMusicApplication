@@ -189,16 +189,3 @@ suspend fun updateGenre(
         }
     }
 }
-
-fun readGenreFromFile(filePath: String): String {
-    return try {
-        val file = File(filePath)
-        val audioFile = AudioFileIO.read(file)
-        val tag = audioFile.tagOrCreateAndSetDefault
-        val genre = tag.getFirst(FieldKey.GENRE)
-        genre ?: "Unknown"
-    } catch (e: Exception) {
-        e.printStackTrace()
-        ""
-    }
-}

@@ -6,8 +6,9 @@ import android.content.ContentUris
 import android.content.Context
 import android.net.Uri
 import android.provider.MediaStore
-import androidx.compose.runtime.mutableStateOf
-import com.example.mymusicapplication.controllers.readGenreFromFile
+import org.jaudiotagger.audio.AudioFileIO
+import org.jaudiotagger.tag.FieldKey
+import java.io.File
 import java.io.FileNotFoundException
 
 class MusicRepository(private val context: Context) {
@@ -15,11 +16,23 @@ class MusicRepository(private val context: Context) {
     fun getAllMusic(): List<Album> {
         val albums = mutableListOf<Album>()
         val contentResolver: ContentResolver = context.contentResolver
+
+        val projection = arrayOf(
+            MediaStore.Audio.Media._ID,
+            MediaStore.Audio.Media.TRACK,
+            MediaStore.Audio.Media.TITLE,
+            MediaStore.Audio.Media.ARTIST,
+            MediaStore.Audio.Media.ALBUM,
+            MediaStore.Audio.Media.DURATION,
+            MediaStore.Audio.Media.DATA
+        )
+
         val uri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
-        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
+        val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0 AND ${MediaStore.Audio.Media.MIME_TYPE} = ?"
+        val selectionArgs = arrayOf("audio/mpeg")
         val sortOrder = "${MediaStore.Audio.Media.ALBUM_ARTIST} ASC"
 
-        val cursor = contentResolver.query(uri, null, selection, null, sortOrder)
+        val cursor = contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
         cursor?.use { c ->
             val albumMap = mutableMapOf<String, Pair<String, MutableList<Song>>>()
             val genreMap = mutableMapOf<String, MutableSet<String>>()
@@ -75,6 +88,19 @@ class MusicRepository(private val context: Context) {
             true
         } catch (e: Exception) {
             false
+        }
+    }
+
+    fun readGenreFromFile(filePath: String): String {
+        return try {
+            val file = File(filePath)
+            val audioFile = AudioFileIO.read(file)
+            val tag = audioFile.tagOrCreateAndSetDefault
+            val genre = tag.getFirst(FieldKey.GENRE)
+            genre ?: "Unknown"
+        } catch (e: Exception) {
+            e.printStackTrace()
+            ""
         }
     }
 
