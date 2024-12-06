@@ -55,6 +55,11 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
 
     private val _albums = MutableStateFlow<List<Album>>(emptyList())
     val albums: StateFlow<List<Album>> = _albums.asStateFlow()
+    // In-memory cache for genres
+    private val genreCache = mutableMapOf<String, String>()
+    private val _isEnrichingGenres = MutableStateFlow(false)
+    val isEnrichingGenres: StateFlow<Boolean> = _isEnrichingGenres.asStateFlow()
+
 
     var selectedAlbum by mutableStateOf<Album?>(null)
     var isTagSearchModalOpen by mutableStateOf(false)
@@ -103,11 +108,51 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
             val albumList = musicRepository.getAllMusic()
             _albums.value = albumList
 
-            updateTagsFromAlbums()
+            enrichGenres()
         }
     }
 
-    private fun updateTagsFromAlbums() {
+    private suspend fun enrichGenres() {
+        _isEnrichingGenres.value = true
+
+        val updatedAlbums = mutableListOf<Album>()
+        for (album in _albums.value) {
+            val updatedSongs = album.songs.map { song ->
+                if (song.genre.isBlank()) {
+                    val cachedGenre = genreCache[song.data]
+                    val genre = if (cachedGenre != null) {
+                        cachedGenre
+                    } else {
+                        val g = musicRepository.readGenreFromFile(song.data)
+                        genreCache[song.data] = g
+                        g
+                    }
+                    song.copy(genre = genre)
+                } else {
+                    song
+                }
+            }
+            // Rebuild the album with updated song genres
+            val genreJoined = updatedSongs.asSequence()
+                .map { it.genre }
+                .filter { it.isNotBlank() }
+                .distinct()
+                .joinToString(";")
+
+            updatedAlbums.add(album.copy(
+                songs = updatedSongs,
+                genre = genreJoined.ifBlank { "Unknown" }
+            ))
+        }
+
+        // Update the stateFlow with enriched data
+        withContext(Dispatchers.Main) {
+            _albums.value = updatedAlbums
+            _isEnrichingGenres.value = false
+        }
+    }
+
+    fun updateTagsFromAlbums() {
         val genreTags = mutableSetOf<String>()
         _albums.value.forEach { album ->
             album.genre.split(';').filter { it.isNotBlank() }.forEach { genre ->

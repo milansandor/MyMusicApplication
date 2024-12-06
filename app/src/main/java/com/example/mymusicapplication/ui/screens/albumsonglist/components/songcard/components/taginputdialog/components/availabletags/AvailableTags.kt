@@ -26,7 +26,7 @@ fun AvailableTags(
     }
 
     LazyColumn {
-        items(tags) {tag ->
+        items(tags.sortedBy { it.lowercase() }) {tag ->
             val isChecked = selectedTags.contains(tag)
             SelectableTag(
                 tag = tag,
