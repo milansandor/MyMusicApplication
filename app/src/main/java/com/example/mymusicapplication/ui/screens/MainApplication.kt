@@ -2,7 +2,6 @@ package com.example.mymusicapplication.ui.screens
 
 import android.content.Context
 import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,7 +12,6 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -37,17 +35,6 @@ fun MainApplication(
     context: Context
 ) {
     val albums by musicViewModel.albums.collectAsState()
-    val isEnriching by musicViewModel.isEnrichingGenres.collectAsState()
-
-    LaunchedEffect(isEnriching) {
-        if (isEnriching) {
-            Toast.makeText(context, "Loading genre information...", Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(context, "Genre information available!", Toast.LENGTH_SHORT).show()
-            musicViewModel.updateTagsFromAlbums()
-        }
-    }
-
     val scope = rememberCoroutineScope()
 
     // Observe the tags and checkedTags state from the ViewModel

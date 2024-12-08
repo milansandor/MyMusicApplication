@@ -1,26 +1,18 @@
 package com.example.mymusicapplication.controllers
 
-import android.app.Activity
 import android.app.RecoverableSecurityException
 import android.content.ContentUris
-import android.content.ContentValues
 import android.content.Context
-import android.content.IntentSender
 import android.media.MediaPlayer
 import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.IntentSenderRequest
-import androidx.core.app.ActivityCompat.startIntentSenderForResult
-import androidx.core.net.toUri
-import com.example.mymusicapplication.MainActivity
 import com.example.mymusicapplication.models.Song
 import com.example.mymusicapplication.models.SongUpdateInfo
-import com.example.mymusicapplication.viewmodels.MusicViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext

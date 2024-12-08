@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import org.jaudiotagger.audio.AudioFileIO
@@ -35,6 +36,8 @@ class MusicRepository(private val context: Context) {
         val cursor = contentResolver.query(uri, projection, selection, selectionArgs, sortOrder)
         cursor?.use { c ->
             val albumMap = mutableMapOf<String, Pair<String, MutableList<Song>>>()
+            val genreMap = mutableMapOf<String, MutableSet<String>>()
+            val retriever = MediaMetadataRetriever()
 
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
@@ -50,15 +53,20 @@ class MusicRepository(private val context: Context) {
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
                 val duration = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
+                retriever.setDataSource(data)
+                val genre = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
 
-                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = "")
+                val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = genre)
 
                 if (albumMap.containsKey(album)) {
                     albumMap[album]?.second?.add(song)
+                    genreMap[album]?.addAll(genre.split(";").map { it.trim() })
                 } else {
                     albumMap[album] = Pair(artist, mutableListOf(song))
+                    genreMap[album] = mutableSetOf(*genre.split(";").map { it.trim() }.toTypedArray())
                 }
             }
+            retriever.release()
 
             for ((albumName, pair) in albumMap) {
                 val (artist, songs) = pair
@@ -68,7 +76,8 @@ class MusicRepository(private val context: Context) {
                 } else {
                     null
                 }
-                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre = "")
+                val genre = genreMap[albumName]?.joinToString(";") ?: "Unknown"
+                val album = Album(albumName, artist, songs, albumArtPath.toString(), genre = genre)
                 albums.add(album)
             }
         }
