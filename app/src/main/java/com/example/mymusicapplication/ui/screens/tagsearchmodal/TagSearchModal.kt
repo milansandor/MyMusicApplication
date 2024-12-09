@@ -48,14 +48,14 @@ fun TagSearchModal(
     checkedTags: Map<String, Boolean>,
     onCheckedTagChange: (String, Boolean) -> Unit,
     isModalOpen: Boolean,
-    onDismiss: () -> Unit,
+    onRemoveChecks: (List<String>) -> Unit,
     onAddTag: (String) -> Unit,
     onRemoveTag: (String) -> Unit,
     onModifyTagName: (String, String) -> Unit
 ) {
     if (isModalOpen) {
         TagListModal(
-            onDismiss = onDismiss,
+            onRemoveChecks = onRemoveChecks,
             tags = tags,
             remainingTags = remainingTags,
             checkedTags = checkedTags,
@@ -69,7 +69,7 @@ fun TagSearchModal(
 
 @Composable
 fun TagListModal(
-    onDismiss: () -> Unit,
+    onRemoveChecks: (List<String>) -> Unit,
     tags: List<String>,
     remainingTags: List<String>,
     checkedTags: Map<String, Boolean>,
@@ -89,9 +89,11 @@ fun TagListModal(
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(
-                    onClick = onDismiss,
+                    onClick = {
+                      onRemoveChecks(tags)
+                    },
                 ) {
-                    Text("X")
+                    Text("Remove check(s)")
                 }
             }
             TagList(

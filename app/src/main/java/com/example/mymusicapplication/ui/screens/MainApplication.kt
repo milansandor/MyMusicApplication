@@ -65,17 +65,13 @@ fun MainApplication(
         albums
     } else {
         albums.filter { album ->
-            activeTags.all { tag -> album.genre.contains(tag) }
+            val albumGenres = album.genre.split(";")
+            activeTags.all { tag -> tag in albumGenres }
         }
     }
 
-    // Filter albums that match all checked tags
-    val matchedAlbums = albums.filter { album ->
-        activeTags.all { tag -> album.genre.split(";").contains(tag) }
-    }
-
     // Get all genres from the matched albums
-    val additionalGenres = matchedAlbums
+    val additionalGenres = filteredAlbums
         .flatMap { it.genre.split(";") } // Split genres into a flat list
         .filter { tag -> tag.isNotBlank() } // Exclude empty or blank tags
         .distinct() // Ensure unique genres
@@ -128,7 +124,7 @@ fun MainApplication(
                         Log.i("checked:", checkedTags.toString())
                     },
                     isModalOpen = musicViewModel.isTagSearchModalOpen,
-                    onDismiss = { musicViewModel.isTagSearchModalOpen = false },
+                    onRemoveChecks = { tags.forEach { tag -> checkedTags[tag] = false } },
                     onAddTag = onAddGenreTag,
                     onRemoveTag = onRemoveTag,
                     onModifyTagName = onModifyTagName
