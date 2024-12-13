@@ -35,13 +35,11 @@ import com.example.mymusicapplication.viewmodels.MusicViewModel
 fun SongCard(
     context: Context,
     song: Song,
-    genre: String,
     tags: SnapshotStateList<String>,
     album: Album,
     isSelected: Boolean,
     onClick: () -> Unit,
     onTagAdded: (String) -> Unit,
-    onSongUpdated: (Song) -> Unit,
     showMoreVertIcon: Boolean,
     musicViewModel: MusicViewModel
 ) {
@@ -108,17 +106,12 @@ fun SongCard(
             TagInputDialog(
                 context = context,
                 song = song,
-                genre = genre,
                 tags = tags,
                 album = album,
                 onDismiss = {
                     showInputDialog = false
                 },
                 onTagAdded = onTagAdded,
-                onSongUpdated = { updatedSong ->
-                    onSongUpdated(updatedSong)
-                    showInputDialog = false
-                },
                 musicViewModel = musicViewModel
             )
         }

@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshots.SnapshotStateMap
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -25,7 +24,6 @@ import com.example.mymusicapplication.controllers.setOnSongEndListener
 import com.example.mymusicapplication.ui.screens.albumsonglist.AlbumSongList
 import com.example.mymusicapplication.ui.screens.songmanager.SongManagerComposable
 import com.example.mymusicapplication.controllers.stopCurrentSong
-import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.ui.screens.tagsearchmodal.TagSearchModal
 import com.example.mymusicapplication.viewmodels.MusicViewModel
 

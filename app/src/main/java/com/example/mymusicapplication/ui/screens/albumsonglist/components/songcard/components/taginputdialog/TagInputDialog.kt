@@ -42,12 +42,10 @@ import kotlinx.coroutines.launch
 fun TagInputDialog(
     context: Context,
     song: Song,
-    genre: String,
     tags: SnapshotStateList<String>,
     album: Album,
     onDismiss: () -> Unit,
     onTagAdded: (String) -> Unit,
-    onSongUpdated: (Song) -> Unit,
     musicViewModel: MusicViewModel
 ) {
     val songTags = remember { mutableStateListOf<String>().apply { addAll(song.genre.split(";")) } }

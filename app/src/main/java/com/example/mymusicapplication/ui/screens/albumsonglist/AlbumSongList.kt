@@ -10,8 +10,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -39,8 +37,6 @@ fun AlbumSongList(
     onTagAdded: (String) -> Unit,
     musicViewModel: MusicViewModel
 ) {
-    val songsState = remember { mutableStateListOf<Song>().apply { addAll(album.songs) } }
-
     val painter = if (album.albumArtUri != "null") {
         rememberAsyncImagePainter(model = album.albumArtUri)
     } else {
@@ -65,7 +61,6 @@ fun AlbumSongList(
                     context = context,
                     song = song,
                     isSelected = song == selectedSong,
-                    genre = song.genre,
                     tags = tags,
                     album = album,
                     onClick = {
@@ -79,12 +74,6 @@ fun AlbumSongList(
                         }
                     },
                     onTagAdded = onTagAdded,
-                    onSongUpdated = { updatedSong ->
-                        val index = songsState.indexOfFirst { it.id == updatedSong.id }
-                        if (index != -1) {
-                            songsState[index] = updatedSong
-                        }
-                    },
                     showMoreVertIcon = index == 0,
                     musicViewModel = musicViewModel
                 )
