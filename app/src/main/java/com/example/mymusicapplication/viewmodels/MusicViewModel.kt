@@ -56,11 +56,6 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
 
     private val _albums = MutableStateFlow<List<Album>>(emptyList())
     val albums: StateFlow<List<Album>> = _albums.asStateFlow()
-    // In-memory cache for genres
-    private val genreCache = mutableMapOf<String, String>()
-    private val _isEnrichingGenres = MutableStateFlow(false)
-    val isEnrichingGenres: StateFlow<Boolean> = _isEnrichingGenres.asStateFlow()
-
 
     var selectedAlbum by mutableStateOf<Album?>(null)
     var isTagSearchModalOpen by mutableStateOf(false)

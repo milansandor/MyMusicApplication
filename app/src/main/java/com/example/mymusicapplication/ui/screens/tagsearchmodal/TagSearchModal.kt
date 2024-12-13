@@ -1,5 +1,6 @@
 package com.example.mymusicapplication.ui.screens.tagsearchmodal
 
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -51,7 +52,8 @@ fun TagSearchModal(
     onRemoveChecks: (List<String>) -> Unit,
     onAddTag: (String) -> Unit,
     onRemoveTag: (String) -> Unit,
-    onModifyTagName: (String, String) -> Unit
+    onModifyTagName: (String, String) -> Unit,
+    albumCount: Int,
 ) {
     if (isModalOpen) {
         TagListModal(
@@ -62,7 +64,8 @@ fun TagSearchModal(
             onCheckedTagChange = onCheckedTagChange,
             onAddTag = onAddTag,
             onRemoveTag = onRemoveTag,
-            onModifyTagName = onModifyTagName
+            onModifyTagName = onModifyTagName,
+            albumCount = albumCount
         )
     }
 }
@@ -76,7 +79,8 @@ fun TagListModal(
     onCheckedTagChange: (String, Boolean) -> Unit,
     onAddTag: (String) -> Unit,
     onRemoveTag: (String) -> Unit,
-    onModifyTagName: (String, String) -> Unit
+    onModifyTagName: (String, String) -> Unit,
+    albumCount: Int,
 ) {
     ElevatedCard(
         modifier = Modifier
@@ -86,8 +90,13 @@ fun TagListModal(
         Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                Text(
+                    text = "$albumCount albums",
+                    modifier = Modifier.padding(start = 16.dp)
+                )
                 TextButton(
                     onClick = {
                       onRemoveChecks(tags)

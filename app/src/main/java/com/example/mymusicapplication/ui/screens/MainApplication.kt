@@ -127,7 +127,8 @@ fun MainApplication(
                     onRemoveChecks = { tags.forEach { tag -> checkedTags[tag] = false } },
                     onAddTag = onAddGenreTag,
                     onRemoveTag = onRemoveTag,
-                    onModifyTagName = onModifyTagName
+                    onModifyTagName = onModifyTagName,
+                    albumCount = filteredAlbums.size
                 )
             }
 
@@ -161,9 +162,3 @@ fun MainApplication(
         }
     }
 }
-fun getRemainingTags(
-    filteredAlbums: List<Album>,
-    checkedTags: SnapshotStateMap<String, Boolean>
-) = filteredAlbums.map { it.genre }
-    .distinct()
-    .filter { tag -> !checkedTags.getOrDefault(tag, false) }
