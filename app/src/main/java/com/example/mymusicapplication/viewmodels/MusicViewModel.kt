@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.mymusicapplication.controllers.SongCacheManager
 import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
@@ -27,10 +28,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class MusicViewModel(application: Application): AndroidViewModel(application) {
     private val musicRepository = MusicRepository(application)
+    private val songCacheManager = SongCacheManager(application)
     private var pendingOperation: (() -> Unit)? = null
 
     private val requiredPermissions: List<String>
@@ -158,7 +159,9 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
                         .joinToString(";")
 
                     // Add this song to the update list
-                    songsToUpdate.add(SongUpdateInfo(song.id, song.data.toString(), updatedGenre))
+                    songsToUpdate.add(SongUpdateInfo(song.id, song.data, updatedGenre))
+                    // Update the genre in cache
+                    songCacheManager.updateCachedSongGenre(song.id.toString(), updatedGenre)
                 }
             }
         }
@@ -221,6 +224,8 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
                         .joinToString(";")
 
                     songsToUpdate.add(SongUpdateInfo(song.id, song.data.toString(), updatedGenre))
+                    // Update the genre in cache
+                    songCacheManager.updateCachedSongGenre(song.id.toString(), updatedGenre)
                 }
             }
         }

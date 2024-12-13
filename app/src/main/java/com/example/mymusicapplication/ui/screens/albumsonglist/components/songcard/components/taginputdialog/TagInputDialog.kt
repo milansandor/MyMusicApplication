@@ -28,6 +28,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.mymusicapplication.controllers.SongCacheManager
 import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song
@@ -53,6 +54,7 @@ fun TagInputDialog(
     val selectedTags = remember { mutableStateListOf<String>() }
     val newTag = remember { mutableStateOf("") }
     val brandNewTags = remember { mutableStateListOf<String>() }
+    val songCacheManager = SongCacheManager(context)
 
     val recoverablePermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartIntentSenderForResult(),
@@ -139,6 +141,7 @@ fun TagInputDialog(
                         val updatedAlbumSongsInfo = mutableListOf<SongUpdateInfo>()
                         album.songs.forEach { song ->
                             updatedAlbumSongsInfo.add(SongUpdateInfo(song.id, song.data, newTagString))
+                            songCacheManager.updateCachedSongGenre(song.id.toString(), newTagString)
                             song.genre = newTagString
                         }
 

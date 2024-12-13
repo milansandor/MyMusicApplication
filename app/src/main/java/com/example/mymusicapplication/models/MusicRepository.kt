@@ -7,12 +7,11 @@ import android.content.Context
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
-import org.jaudiotagger.audio.AudioFileIO
-import org.jaudiotagger.tag.FieldKey
-import java.io.File
+import com.example.mymusicapplication.controllers.SongCacheManager
 import java.io.FileNotFoundException
 
 class MusicRepository(private val context: Context) {
+    private val songCacheManager = SongCacheManager(context)
 
     fun getAllMusic(): List<Album> {
         val albums = mutableListOf<Album>()
@@ -37,7 +36,6 @@ class MusicRepository(private val context: Context) {
         cursor?.use { c ->
             val albumMap = mutableMapOf<String, Pair<String, MutableList<Song>>>()
             val genreMap = mutableMapOf<String, MutableSet<String>>()
-            val retriever = MediaMetadataRetriever()
 
             while (c.moveToNext()) {
                 val id = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media._ID))
@@ -53,8 +51,11 @@ class MusicRepository(private val context: Context) {
                 val album = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM))
                 val duration = c.getLong(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DURATION))
                 val data = c.getString(c.getColumnIndexOrThrow(MediaStore.Audio.Media.DATA))
-                retriever.setDataSource(data)
-                val genre = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
+                var genre = songCacheManager.getCachedSongGenre(songId = id.toString()) ?: ""
+                if (genre.isEmpty()) {
+                    genre = getGenreByRetriever(data)
+                    songCacheManager.cacheSongGenre(songId = id.toString(), genre = genre)
+                }
 
                 val song = Song(id, finalTrackNumber, title, artist, album, duration, data, genre = genre)
 
@@ -66,7 +67,6 @@ class MusicRepository(private val context: Context) {
                     genreMap[album] = mutableSetOf(*genre.split(";").map { it.trim() }.toTypedArray())
                 }
             }
-            retriever.release()
 
             for ((albumName, pair) in albumMap) {
                 val (artist, songs) = pair
@@ -85,6 +85,14 @@ class MusicRepository(private val context: Context) {
         return albums
     }
 
+    private fun getGenreByRetriever(data: String): String {
+        val retriever = MediaMetadataRetriever()
+        retriever.setDataSource(data)
+        val genre = retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE) ?: ""
+        retriever.release()
+        return genre
+    }
+
     private fun fileExists(uri: Uri): Boolean {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
@@ -92,19 +100,6 @@ class MusicRepository(private val context: Context) {
             true
         } catch (e: Exception) {
             false
-        }
-    }
-
-    fun readGenreFromFile(filePath: String): String {
-        return try {
-            val file = File(filePath)
-            val audioFile = AudioFileIO.read(file)
-            val tag = audioFile.tagOrCreateAndSetDefault
-            val genre = tag.getFirst(FieldKey.GENRE)
-            genre ?: "Unknown"
-        } catch (e: Exception) {
-            e.printStackTrace()
-            ""
         }
     }
 
