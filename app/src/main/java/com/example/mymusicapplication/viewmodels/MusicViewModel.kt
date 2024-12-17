@@ -71,6 +71,18 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         checkAllPermissionsGranted()
     }
 
+    // Checks if all required permissions are granted.
+    private fun checkAllPermissionsGranted() {
+        val context = getApplication<Application>().applicationContext
+        isPermissionGranted.value = requiredPermissions.all { permission ->
+            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+        }
+
+        if (isPermissionGranted.value) {
+            loadMusic()
+        }
+    }
+
     fun dismissDialog() {
         visiblePermissionDialogQueue.removeFirst()
         checkAllPermissionsGranted()
@@ -85,18 +97,6 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         }
 
         checkAllPermissionsGranted()
-    }
-
-    // Checks if all required permissions are granted.
-    private fun checkAllPermissionsGranted() {
-        val context = getApplication<Application>().applicationContext
-        isPermissionGranted.value = requiredPermissions.all { permission ->
-            ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
-        }
-
-        if (isPermissionGranted.value) {
-            loadMusic()
-        }
     }
 
     private fun loadMusic() {
@@ -123,14 +123,14 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         }
     }
 
-    // modification operations
-    fun setPendingOperation(operation: () -> Unit) {
-        pendingOperation = operation
-    }
-
     fun retryPendingOperation() {
         pendingOperation?.invoke()
         pendingOperation = null
+    }
+
+    // modification operations
+    fun setPendingOperation(operation: () -> Unit) {
+        pendingOperation = operation
     }
 
     // tag management
@@ -260,7 +260,7 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
         Log.i("TAG_REMOVAL", "Removed tag: $tag")
     }
 
-    fun onSongEnd(context: Context, scope: CoroutineScope) {
+    fun onSongEnd() {
         val songList = currentlyPlayingAlbum?.songs?.sortedBy { it.track } ?: emptyList()
         val currentIndex = songList.indexOfFirst { it.title == selectedSong?.title }
         val nextIndex = currentIndex + 1

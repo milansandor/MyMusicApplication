@@ -1,8 +1,5 @@
 package com.example.mymusicapplication.models
 
-import android.net.Uri
-
-
 data class Song(
     val id: Long,
     val track: Int,

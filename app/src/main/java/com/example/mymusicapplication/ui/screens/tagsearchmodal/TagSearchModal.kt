@@ -118,7 +118,7 @@ fun TagListModal(
 }
 
 @Composable
-fun TagAddButton(
+fun TagInput(
     onAddTag: (String) -> Unit,
     modifier: Modifier
 ) {
@@ -186,7 +186,7 @@ fun TagList(
                 )
             }
         }
-        TagAddButton(
+        TagInput(
             onAddTag = onAddTag,
             modifier = Modifier
                 .align(Alignment.BottomCenter)

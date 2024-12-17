@@ -71,7 +71,7 @@ class MusicRepository(private val context: Context) {
             for ((albumName, pair) in albumMap) {
                 val (artist, songs) = pair
                 val albumArtUri = getAlbumArtUri(albumName)
-                val albumArtPath = if (albumArtUri != null && fileExists(albumArtUri)) {
+                val albumArtPath = if (albumArtUri != null && albumArtExists(albumArtUri)) {
                     albumArtUri.toString()
                 } else {
                     null
@@ -93,7 +93,7 @@ class MusicRepository(private val context: Context) {
         return genre
     }
 
-    private fun fileExists(uri: Uri): Boolean {
+    private fun albumArtExists(uri: Uri): Boolean {
         return try {
             val inputStream = context.contentResolver.openInputStream(uri)
             inputStream?.close()

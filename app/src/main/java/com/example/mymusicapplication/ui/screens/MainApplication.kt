@@ -52,7 +52,7 @@ fun MainApplication(
     }
 
     val onSongEnd: () -> Unit = {
-        musicViewModel.onSongEnd(context, scope)
+        musicViewModel.onSongEnd()
     }
 
     setOnSongEndListener(onSongEnd)
