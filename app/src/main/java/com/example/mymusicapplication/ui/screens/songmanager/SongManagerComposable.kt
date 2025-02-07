@@ -177,15 +177,6 @@ fun SongManagerComposable(
                     tint = Color.White
                 )
             }
-
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(
-                    painterResource(id = R.drawable.filter),
-                    contentDescription = "",
-                    modifier = Modifier.size(14.dp),
-                    tint = Color.White
-                )
-            }
         }
     }
 }

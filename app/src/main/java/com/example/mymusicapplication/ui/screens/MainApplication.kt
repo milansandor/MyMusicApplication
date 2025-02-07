@@ -70,7 +70,7 @@ fun MainApplication(
 
     // Get all genres from the matched albums
     val additionalGenres = filteredAlbums
-        .flatMap { it.genre.split(";") } // Split genres into a flat list
+        .flatMap { album -> album.genre.split(";") } // Split genres into a flat list
         .filter { tag -> tag.isNotBlank() } // Exclude empty or blank tags
         .distinct() // Ensure unique genres
         .filter { tag -> !checkedTags.getOrDefault(tag, false) }// Exclude already checked tags

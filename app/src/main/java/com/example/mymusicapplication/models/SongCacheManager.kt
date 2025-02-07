@@ -1,4 +1,4 @@
-package com.example.mymusicapplication.controllers
+package com.example.mymusicapplication.models
 
 import android.content.Context
 import android.util.Log

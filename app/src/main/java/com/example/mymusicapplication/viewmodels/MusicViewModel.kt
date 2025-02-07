@@ -14,7 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mymusicapplication.controllers.SongCacheManager
+import com.example.mymusicapplication.models.SongCacheManager
 import com.example.mymusicapplication.controllers.playSong
 import com.example.mymusicapplication.controllers.stopCurrentSong
 import com.example.mymusicapplication.models.Album
@@ -84,7 +84,7 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
     }
 
     fun dismissDialog() {
-        visiblePermissionDialogQueue.removeFirst()
+        visiblePermissionDialogQueue.removeAt(0)
         checkAllPermissionsGranted()
     }
 
@@ -109,13 +109,12 @@ class MusicViewModel(application: Application): AndroidViewModel(application) {
     }
 
     private fun updateTagsFromAlbums() {
-        val genreTags = mutableSetOf<String>()
-        _albums.value.forEach { album ->
-            album.genre.split(';').filter { it.isNotBlank() }.forEach { genre ->
-                genreTags.add(genre)
-            }
-        }
-        tags.addAll(genreTags)
+        val individualGenreTags = _albums.value
+            .flatMap{ album -> album.genre.split(";") }
+            .filter { tag -> tag.isNotBlank() }
+            .distinct()
+
+        tags.addAll(individualGenreTags)
         tags.forEach { tag ->
             if (checkedTags[tag] == null) {
                 checkedTags[tag] = false

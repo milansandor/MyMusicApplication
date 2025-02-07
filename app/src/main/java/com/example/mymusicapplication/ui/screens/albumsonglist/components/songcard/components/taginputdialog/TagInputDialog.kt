@@ -28,7 +28,7 @@ import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.example.mymusicapplication.controllers.SongCacheManager
+import com.example.mymusicapplication.models.SongCacheManager
 import com.example.mymusicapplication.controllers.updateGenre
 import com.example.mymusicapplication.models.Album
 import com.example.mymusicapplication.models.Song

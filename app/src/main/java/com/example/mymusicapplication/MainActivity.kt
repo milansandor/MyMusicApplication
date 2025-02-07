@@ -104,9 +104,6 @@ class MainActivity : ComponentActivity() {
                                     Manifest.permission.WRITE_EXTERNAL_STORAGE -> {
                                         WriteExternalStoragePermissionTextProvider()
                                     }
-                                    Manifest.permission.MANAGE_EXTERNAL_STORAGE -> {
-                                        WriteExternalStoragePermissionTextProvider()
-                                    }
                                     else -> return@forEach
                                 },
                             isPermanentlyDeclined = !shouldShowRequestPermissionRationale(
